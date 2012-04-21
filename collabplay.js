@@ -31,7 +31,7 @@ if (Meteor.is_client) {
 
     if (!currentPlaylist()) return [];
     
-    setTimeout(attachTypeAhead, 1);
+    setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
     return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
   }
 
@@ -52,10 +52,11 @@ if (Meteor.is_client) {
 
 
   Template.playlistHeader.needlePosition = function() {
-
+   
+    
     var playPos = getPlaypos();
-    console.log("plauPos", playPos)
     if (playPos == 0) return 0;
+    
     var ctx = Meteor.deps.Context.current;
     setTimeout(function() {
       ctx.invalidate();
@@ -64,7 +65,7 @@ if (Meteor.is_client) {
     return playPos;
   }
 
-  Template.playlist.events = {
+  Template.playlistItems.events = {
     'click .playlistItem': function(e) {
       
       e.preventDefault();
@@ -77,6 +78,7 @@ if (Meteor.is_client) {
   Template.playerControls.events = {
     'click .playPause': function(e) {
       e.preventDefault();
+
       
       if (isPlaying())
         pause();
@@ -113,7 +115,6 @@ if (Meteor.is_client) {
           var simpleTracks = [];
           for (var i=0;i<data.tracks.length;i++) {
             var track = data.tracks[i];
-            console.log(track)
             simpleTracks.push({
               name:   track.name,
               href:   track.href,
@@ -182,7 +183,6 @@ function currentPlaylist() {
 }
 
 function changeCurrentPlayList(properties) {
-     console.log("play", properties)
   Playlists.update(
     { name_simple: Session.get('currentPlayListSimpleName') },
     { $set: properties }
