@@ -18,10 +18,14 @@
 <template name="playlist">
   <div id="playlistView" class="{{viewClass}}">
     <h1>{{playListName}}</h1>
+    <h2>{{needlePosition}}</h2>
+    <input type="button" value="{{playPauseButtonLabel}}" class="play btn-success" />
     <div id="playlistItems">
 	    {{#each playlistItems}}
     		<div 	class="playlistItem" 
-    				data-href="({{href}})">{{name}}</div>
+    				data-href="{{href}}">
+    			{{name}}
+    		</div>
 	  	{{/each}}
 	  </div>
     <input class="new" />

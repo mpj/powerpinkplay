@@ -18,6 +18,12 @@ body {
 	padding: 8px;
 }
 
+#playlistView .play {
+	padding: 10px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
 #playlistView h1 { margin-bottom: 20px;}
 .playlistItem { 
 	display: inline-block;
@@ -47,3 +53,4 @@ body {
 	overflow: hidden;
 	text-align: left;
 }
+

@@ -1,8 +1,6 @@
 var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items");
 
-
-
 if (Meteor.is_client) {
 
   var ClientRouter = Backbone.Router.extend({
@@ -20,65 +18,75 @@ if (Meteor.is_client) {
   Backbone.history.start({pushState: true});
 
 
-  Meteor.autosubscribe(function() {
-    var simpleName = Session.get('currentPlayListSimpleName');
-    Meteor.subscribe('playlists', simpleName, function () {
-
-      if (simpleName) {
-        var list = Playlists.findOne({name_simple: simpleName});
-        if (list)
-          Session.set('currentPlayList', list)
-      }
-
-    });
-  });
-
-  Meteor.autosubscribe(function() {
-    var playlist = Session.get('currentPlayList');
-    var id;
-    if (!playlist) 
-      id = 0;
-    else 
-      id = playlist._id;
-
-    Meteor.subscribe('playlist_items', id, function () {
-
-        var items = PlaylistItems.find({playlist_id: id}).fetch();
-        Session.set('currentPlayListItems', items)
-
-    });
-  });
-
-
-
   Template.createPlayList.viewClass = function () {
-    return Session.get('currentPlayList') ? 'hidden' : '';
+    return currentPlaylist() ? 'hidden' : '';
   }
 
   Template.playlist.viewClass = function () {
-    return Session.get('currentPlayList') ? '' : 'hidden';
+    return currentPlaylist() ? '' : 'hidden';
   }
 
   Template.playlist.playListName = function () {
-    var playList = Session.get('currentPlayList')
-    return !!playList ? playList.name : '';
+    return !!currentPlaylist() ? currentPlaylist().name : '';
   }
 
   Template.playlist.playlistItems = function () {
-    var playlist = Session.get('currentPlayList');
-    if (!playlist) return [];
 
+    if (!currentPlaylist()) return [];
     // FIXME: It's REALLY ugly to have this call here,
     // can we do it nicer?
     setTimeout(attachTypeAhead, 1);
-    return PlaylistItems.find({ playlist_id: playlist._id}).fetch()
+    return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
   }
 
+  Template.playlist.playPauseButtonLabel = function() {
+    var simpleName = Session.get('currentPlayListSimpleName');
+    if(!simpleName) return
+    var playlist = Playlists.findOne({ name_simple: simpleName});
+    if (!playlist)
+      return;
+    if (playlist.playing_at)
+      return "Pause";
+    return "Play"
+  }
 
+  Template.playlist.needlePosition = function() {
 
-  Template.createPlayList.greeting = function () {
-    return "Welcome to collabplay.";
-  };
+    var now = Number(new Date());
+    var playlist = currentPlaylist();
+    if(!playlist || !playlist.playing_at) return;
+    var playingFor = now - playlist.playing_at;
+    var position = playlist.playing_from + playingFor;
+    
+    // TODO: check for overflow
+    var duration = getDurationByHref(playlist.playing_track);
+    if (position > duration )
+      return 0;
+
+    var ctx = Meteor.deps.Context.current;
+    setTimeout(function() {
+      ctx.invalidate();
+    },250);
+
+    return position;
+  }
+
+  Template.playlist.events = {
+    'click .playlistItem': function(e) {
+      
+      e.preventDefault();
+      Playlists.update(
+        currentPlaylist()._id,
+        { 
+          $set: {
+            playing_at:     Number(new Date()),
+            playing_from:   0,
+            playing_track:  $(e.target).attr('data-href')
+          }
+        }
+      )
+    }
+  }
 
   Template.createPlayList.events = {
     'click .do' : function (e) {
@@ -90,7 +98,6 @@ if (Meteor.is_client) {
         name: playListName, 
         name_simple: playListNameSimple 
       });
-      
     }
   };
 
@@ -108,9 +115,11 @@ if (Meteor.is_client) {
           var simpleTracks = [];
           for (var i=0;i<data.tracks.length;i++) {
             var track = data.tracks[i];
+            console.log(track)
             simpleTracks.push({
-              name: track.name,
-              href: track.href
+              name:   track.name,
+              href:   track.href,
+              duration: track.length
             });
           }
           return typeahead.process(simpleTracks);
@@ -118,34 +127,35 @@ if (Meteor.is_client) {
       },
 
       onselect: function(simpleTrack) {
-        simpleTrack.playlist_id = Session.get('currentPlayList')._id;
+        simpleTrack.playlist_id = currentPlaylist()._id;
+        console.log("adding", simpleTrack)
         PlaylistItems.insert(simpleTrack)
       }
-    }).focus();
+    });
 
   }
     
 
 }
 
+function currentPlaylist() {
+  return Playlists.findOne({ 
+    name_simple: 
+      Session.get('currentPlayListSimpleName')
+  });
+}
+
+function getDurationByHref(href) {
+  var playlistItem = PlaylistItems.findOne({ href: href});
+  if (!playlistItem) return 0;
+  return playlistItem.duration * 1000;
+}
+
 
 
 if (Meteor.is_server) {
 
-  // Publish all items for requested list_id.
-  Meteor.publish('playlists', function (simpleName) {
-    return Playlists.find({name_simple: simpleName});
-  });
-
-  // Publish all items for requested list_id.
-  Meteor.publish('playlist_items', function (playlistId) {
-    var cursor = PlaylistItems.find({playlist_id: playlistId});
-    return cursor;
-  });
-
-
-
   Meteor.startup(function () {
     // code to run on server at startup
   });
-}
+} 
