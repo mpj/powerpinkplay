@@ -8,12 +8,9 @@ if (Meteor.is_client) {
   var ClientRouter = Backbone.Router.extend({
       routes: {
           "p/:simple_name/" :       "getPlayListBySimpleName"
-          //":route/:action/"  :       "get_route"
       },
 
-      /* Generic routes */
       getPlayListBySimpleName: function( simpleName ) {
-        console.log("getPlayListBySimpleName", simpleName)
         Session.set("currentPlayListSimpleName", simpleName); 
       }
   });
@@ -47,7 +44,6 @@ if (Meteor.is_client) {
     Meteor.subscribe('playlist_items', id, function () {
 
         var items = PlaylistItems.find({playlist_id: id}).fetch();
-        console.log("Fidning", items)
         Session.set('currentPlayListItems', items)
 
     });
@@ -71,8 +67,14 @@ if (Meteor.is_client) {
   Template.playlist.playlistItems = function () {
     var playlist = Session.get('currentPlayList');
     if (!playlist) return [];
+
+    // FIXME: It's REALLY ugly to have this call here,
+    // can we do it nicer?
+    setTimeout(attachTypeAhead, 1);
     return PlaylistItems.find({ playlist_id: playlist._id}).fetch()
   }
+
+
 
   Template.createPlayList.greeting = function () {
     return "Welcome to collabplay.";
@@ -80,8 +82,6 @@ if (Meteor.is_client) {
 
   Template.createPlayList.events = {
     'click .do' : function (e) {
-      if (typeof console !== 'undefined')
-        console.log("You pressed the button");
       var playListName = $('#createPlayListView .name').val();
       if (playListName.length == 0 ) return;
       var playListNameSimple = playListName.replace(" ", "").toLowerCase();
@@ -94,14 +94,15 @@ if (Meteor.is_client) {
     }
   };
 
-  setTimeout(function() {
+
+  function attachTypeAhead() {
+    Meteor.flush();
     $('#playlistView .new').typeahead({
 
       property: 'name',
       
       source: function (typeahead, query) {
         var uri = "http://ws.spotify.com/search/1/track.json?q=" + query;
-        console.log("calling")
         Meteor.http.call("GET", uri, {}, function (error, result) {
           var data = JSON.parse(result.content);
           var simpleTracks = [];
@@ -118,11 +119,12 @@ if (Meteor.is_client) {
 
       onselect: function(simpleTrack) {
         simpleTrack.playlist_id = Session.get('currentPlayList')._id;
-        console.log("inserting", simpleTrack)
         PlaylistItems.insert(simpleTrack)
       }
-    });
-  }, 2000);
+    }).focus();
+
+  }
+    
 
 }
 
@@ -138,7 +140,6 @@ if (Meteor.is_server) {
   // Publish all items for requested list_id.
   Meteor.publish('playlist_items', function (playlistId) {
     var cursor = PlaylistItems.find({playlist_id: playlistId});
-    console.log("found", cursor.fetch())
     return cursor;
   });
 
