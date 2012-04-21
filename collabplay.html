@@ -18,9 +18,12 @@
 <template name="playlist">
   <div id="playlistView" class="{{viewClass}}">
     <h1>{{playListName}}</h1>
-    {{#each playlistItems}}
-    	<div>{{name}} ({{href}})</div>
-  	{{/each}}
+    <div id="playlistItems">
+	    {{#each playlistItems}}
+    		<div 	class="playlistItem" 
+    				data-href="({{href}})">{{name}}</div>
+	  	{{/each}}
+	  </div>
     <input class="new" />
   </div>	
 </template>
