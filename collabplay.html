@@ -12,22 +12,43 @@
     <h1>Create a playlist</h1>
     <input class="name" type="text" />
     <input class="do" type="button" value="Create" />
-  </div>	
+  </div>  
 </template>
+
+
 
 <template name="playlist">
   <div id="playlistView" class="{{viewClass}}">
-    <h1>{{playListName}}</h1>
+    {{> playlistHeader}}
+    {{> playerControls}}
+    
+    {{> playlistItems}}
+    <input class="new" id="playlistViewNew" />
+  </div>  
+</template>
+
+<template name="playlistHeader">
+  <span class="wrapper">
+    <h1>{{playlistName}}</h1>
     <h2>{{needlePosition}}</h2>
-    <input type="button" value="{{playPauseButtonLabel}}" class="play btn-success" />
-    <div id="playlistItems">
-	    {{#each playlistItems}}
-    		<div 	class="playlistItem" 
-    				data-href="{{href}}">
-    			{{name}}
-    		</div>
-	  	{{/each}}
-	  </div>
-    <input class="new" />
-  </div>	
+  </span>
+</template>
+
+<template name="playerControls">
+  <span class="wrapper">
+  <input type="button" value="{{playPauseButtonLabel}}" 
+    class="playPause btn-success" />
+  </span>
+</template>
+
+
+<template name="playlistItems">
+  <div id="playlistItems">
+    {{#each items}}
+    <div  class="playlistItem" 
+          data-href="{{href}}">
+      {{name}}
+    </div>
+    {{/each}}
+  </div>
 </template>

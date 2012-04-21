@@ -26,20 +26,16 @@ if (Meteor.is_client) {
     return currentPlaylist() ? '' : 'hidden';
   }
 
-  Template.playlist.playListName = function () {
-    return !!currentPlaylist() ? currentPlaylist().name : '';
-  }
-
-  Template.playlist.playlistItems = function () {
+  
+  Template.playlistItems.items = function () {
 
     if (!currentPlaylist()) return [];
-    // FIXME: It's REALLY ugly to have this call here,
-    // can we do it nicer?
+    
     setTimeout(attachTypeAhead, 1);
     return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
   }
 
-  Template.playlist.playPauseButtonLabel = function() {
+  Template.playerControls.playPauseButtonLabel = function() {
     var simpleName = Session.get('currentPlayListSimpleName');
     if(!simpleName) return
     var playlist = Playlists.findOne({ name_simple: simpleName});
@@ -50,41 +46,43 @@ if (Meteor.is_client) {
     return "Play"
   }
 
-  Template.playlist.needlePosition = function() {
+  Template.playlistHeader.playlistName = function () {
+    return !!currentPlaylist() ? currentPlaylist().name : '';
+  }
 
-    var now = Number(new Date());
-    var playlist = currentPlaylist();
-    if(!playlist || !playlist.playing_at) return;
-    var playingFor = now - playlist.playing_at;
-    var position = playlist.playing_from + playingFor;
-    
-    // TODO: check for overflow
-    var duration = getDurationByHref(playlist.playing_track);
-    if (position > duration )
-      return 0;
 
+  Template.playlistHeader.needlePosition = function() {
+
+    var playPos = getPlaypos();
+    console.log("plauPos", playPos)
+    if (playPos == 0) return 0;
     var ctx = Meteor.deps.Context.current;
     setTimeout(function() {
       ctx.invalidate();
     },250);
 
-    return position;
+    return playPos;
   }
 
   Template.playlist.events = {
     'click .playlistItem': function(e) {
       
       e.preventDefault();
-      Playlists.update(
-        currentPlaylist()._id,
-        { 
-          $set: {
-            playing_at:     Number(new Date()),
-            playing_from:   0,
-            playing_track:  $(e.target).attr('data-href')
-          }
-        }
-      )
+      play($(e.target).attr('data-href'), 0);
+    }
+  }
+
+
+
+  Template.playerControls.events = {
+    'click .playPause': function(e) {
+      e.preventDefault();
+      
+      if (isPlaying())
+        pause();
+      else {
+        play($(e.target).attr('data-href'));
+      }
     }
   }
 
@@ -128,8 +126,9 @@ if (Meteor.is_client) {
 
       onselect: function(simpleTrack) {
         simpleTrack.playlist_id = currentPlaylist()._id;
-        console.log("adding", simpleTrack)
-        PlaylistItems.insert(simpleTrack)
+        PlaylistItems.insert(simpleTrack);
+        $('#playlistView .new').val('').focus();
+
       }
     });
 
@@ -138,11 +137,56 @@ if (Meteor.is_client) {
 
 }
 
+function getPlaypos() {
+  var playlist = currentPlaylist();
+  if(!playlist || playlist.playing_from == null) return 0; 
+  if(!playlist.playing_at) return playlist.playing_from;
+
+  var now = Number(new Date());
+  var playingFor = now - playlist.playing_at;
+  var position = playlist.playing_from + playingFor;
+  
+  var duration = getDurationByHref(playlist.playing_track);
+  if (position > duration)
+    return 0;
+
+  return position;
+}
+
+function play(href, fromPos) {
+  if (!fromPos == null) fromPos = getPlaypos();
+  changeCurrentPlayList({
+    playing_at:     Number(new Date()),
+    playing_from:   fromPos,
+    playing_track:  href,
+  })
+}
+
+function pause() {
+  changeCurrentPlayList({
+    playing_from: getPlaypos(),
+    playing_at:   null
+  })
+}
+
+function isPlaying() {
+  var playlist = currentPlaylist();
+  return playlist && playlist.playing_at;
+}
+
 function currentPlaylist() {
   return Playlists.findOne({ 
     name_simple: 
       Session.get('currentPlayListSimpleName')
   });
+}
+
+function changeCurrentPlayList(properties) {
+     console.log("play", properties)
+  Playlists.update(
+    { name_simple: Session.get('currentPlayListSimpleName') },
+    { $set: properties }
+  )
 }
 
 function getDurationByHref(href) {
