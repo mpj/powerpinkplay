@@ -3,13 +3,20 @@
 </head>
 
 <body>
-  {{> hello}}
+  {{> createPlayList}}
+  {{> playList }}
 </body>
 
-<template name="hello">
-  <div class="hello">
-    <h1>Hello World!</h1>
-    {{greeting}}
-    <input type="button" value="Click" />
-  </div>
+<template name="createPlayList">
+  <div id="createPlayListView" class="{{viewClass}}">
+    <h1>Create a playlist</h1>
+    <input class="name" type="text" />
+    <input class="do" type="button" value="Create" />
+  </div>	
+</template>
+
+<template name="playList">
+  <div id="playListView" class="{{viewClass}}">
+    <h1>{{playListName}}</h1>
+  </div>	
 </template>
