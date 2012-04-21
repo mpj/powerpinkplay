@@ -9,6 +9,13 @@ body {
 	display: inline-block;
 	width: 500px;
 	margin-top: 120px;
+	margin-bottom: 400px;
+}
+
+#playlistView .new { 
+	width: 500px;
+	font-size: 18px;
+	padding: 8px;
 }
 
 #playlistView h1 { margin-bottom: 20px;}
@@ -31,4 +38,12 @@ body {
 .playlistItem:nth-child(1) {
 	background-color: #00AD0E;
 	color: white;
+}
+
+.typeahead.dropdown-menu {
+	font-size: 18px;
+	padding: 8px;
+	width: 500px;
+	overflow: hidden;
+	text-align: left;
 }

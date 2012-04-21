@@ -1455,6 +1455,12 @@
 
 }( window.jQuery );
 
+
+/*
+ * NOTE! The included typeahead is a fork of the original,
+ * to get server-side support. See: https://gist.github.com/1866577
+ */
+
 /* =============================================================
  * bootstrap-typeahead.js v2.0.0
  * http://twitter.github.com/bootstrap/javascript.html#typeahead
