@@ -4,7 +4,7 @@
 
 <body>
   {{> createPlayList}}
-  {{> playList }}
+  {{> playlist }}
 </body>
 
 <template name="createPlayList">
@@ -15,8 +15,12 @@
   </div>	
 </template>
 
-<template name="playList">
-  <div id="playListView" class="{{viewClass}}">
+<template name="playlist">
+  <div id="playlistView" class="{{viewClass}}">
     <h1>{{playListName}}</h1>
+    {{#each playlistItems}}
+    	<div>{{name}} ({{href}})</div>
+  	{{/each}}
+    <input class="new" />
   </div>	
 </template>
