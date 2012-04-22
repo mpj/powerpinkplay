@@ -52,46 +52,42 @@ if (Meteor.is_client) {
 
 
   Template.playlistItems.needlePosition = function() {
-   
-    var playPos = getPlaypos();
-    if (playPos == 0) return 0;
+    var item = activeItem(),
+        now = Number(new Date()),
+        base = 500;
 
-    var duration = getDurationByHref(currentPlaylist().playing_track);
-    console.log("duration", duration)
-    var percent = playPos / duration;
 
-    if (isPlaying) { 
+    if (!item) return 0;
+
+    var currentPosition;
+    if (item.playing_since)
+      currentPosition = now - item.playing_since + item.position;
+    else
+      currentPosition = item.position;
+
+    var progress = currentPosition / item.duration;
+    if (progress > 1)
+      return 0;
+
+    if (!!item.playing_since) { 
       var ctx = Meteor.deps.Context.current;
       setTimeout(function() {
         ctx.invalidate();
       },250);
     }
-    
-    var base = 500;
-    return Math.floor(base * percent);
+
+    return Math.floor(base * progress);
   }
 
   Template.playlistItems.events = {
     'click .playlistItem': function(e) {
       
       e.preventDefault();
-      play($(e.currentTarget).attr('data-href'), 0);
+      var id = $(e.currentTarget).attr("data-id");
+      playPauseItem(id);
     }
   }
 
-
-
-  Template.playerControls.events = {
-    'click .playPause': function(e) {
-      e.preventDefault();
-
-      if (isPlaying())
-        pause();
-      else {
-        play($(e.target).attr('data-href'));
-      }
-    }
-  }
 
   Template.createPlayList.events = {
     'click .do' : function (e) {
@@ -123,7 +119,7 @@ if (Meteor.is_client) {
             simpleTracks.push({
               name:   track.name,
               href:   track.href,
-              duration: track.length
+              duration: track.length*1000
             });
           }
           return typeahead.process(simpleTracks);
@@ -140,45 +136,41 @@ if (Meteor.is_client) {
 
   }
     
-
 }
 
-function getPlaypos() {
-  var playlist = currentPlaylist();
-  if(!playlist || playlist.playing_from == null) return 0; 
-  if(!playlist.playing_at) return playlist.playing_from;
-
+function playPauseItem(id) {
+  var item = PlaylistItems.findOne(id);
   var now = Number(new Date());
-  var playingFor = now - playlist.playing_at;
-  var position = playlist.playing_from + playingFor;
-  
-  var duration = getDurationByHref(playlist.playing_track);
-  if (position > duration)
-    return 0;
 
-  return position;
+  if (item.position == null) {
+    // New item, remove the active status of the old item.
+    if(activeItem())
+      PlaylistItems.update(activeItem()._id, { $set: { position: null, playing_since: null } })
+    PlaylistItems.update(item._id, { $set: { 
+      position: 0, playing_since: now 
+    } });
+  } else if (item.playing_since) {
+    // Is playing, pause it at current position.
+    PlaylistItems.update(item._id, { $set: {
+      position: now - item.playing_since + item.position, 
+      playing_since: null 
+    } });
+  } else {
+    // Has a .position, but not .playing_since, that 
+    // means it's paused. Start playing it again.
+    PlaylistItems.update(item._id, { $set: {
+      playing_since: now 
+    } });
+
+  }
+
 }
 
-function play(href, fromPos) {
-  if (!href) throw new Error("Must provide href!")
-  if (!fromPos == null) fromPos = getPlaypos();
-  changeCurrentPlayList({
-    playing_at:     Number(new Date()),
-    playing_from:   fromPos,
-    playing_track:  href,
-  })
-}
-
-function pause() {
-  changeCurrentPlayList({
-    playing_from: getPlaypos(),
-    playing_at:   null
-  })
-}
-
-function isPlaying() {
-  var playlist = currentPlaylist();
-  return playlist && playlist.playing_at;
+function activeItem() {
+  return PlaylistItems.findOne({ 
+    playlist_id: currentPlaylist()._id,
+    position: { $gte: 0 }
+  });
 }
 
 function currentPlaylist() {
@@ -188,12 +180,6 @@ function currentPlaylist() {
   });
 }
 
-function changeCurrentPlayList(properties) {
-  Playlists.update(
-    { name_simple: Session.get('currentPlayListSimpleName') },
-    { $set: properties }
-  )
-}
 
 function getDurationByHref(href) {
   var playlistItem = PlaylistItems.findOne({ href: href});
