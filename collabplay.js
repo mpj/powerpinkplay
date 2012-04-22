@@ -35,29 +35,18 @@ if (Meteor.is_client) {
     return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
   }
 
-  Template.playerControls.playPauseButtonLabel = function() {
-    var simpleName = Session.get('currentPlayListSimpleName');
-    if(!simpleName) return
-    var playlist = Playlists.findOne({ name_simple: simpleName});
-    if (!playlist)
-      return;
-    if (playlist.playing_at)
-      return "Pause";
-    return "Play"
-  }
 
   Template.playlistHeader.playlistName = function () {
     return !!currentPlaylist() ? currentPlaylist().name : '';
   }
 
+  Template.playlistItems.needlePosition = function(id) {
 
-  Template.playlistItems.needlePosition = function() {
-    var item = activeItem(),
+    var item = PlaylistItems.findOne(id),
         now = Number(new Date()),
         base = 500;
 
-
-    if (!item) return 0;
+    if (!item || item.position == null) return 0;
 
     var currentPosition;
     if (item.playing_since)

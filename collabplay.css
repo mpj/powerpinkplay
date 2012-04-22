@@ -34,6 +34,7 @@ body {
 	margin-bottom: 15px;
 	font-size: 18px;
 	text-align: left;
+	cursor: pointer;
 }
 .playlistItem .name {
 	position: absolute;

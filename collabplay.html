@@ -18,7 +18,6 @@
 <template name="playlist">
   <div id="playlistView" class="{{viewClass}}">
     {{> playlistHeader}}
-    {{> playerControls}}
     {{> playlistItems}}
     <input class="new" />
   </div>  
@@ -30,21 +29,14 @@
   </span>
 </template>
 
-<template name="playerControls">
-  <span class="wrapper">
-  <input type="button" value="{{playPauseButtonLabel}}" 
-    class="playPause btn-success" />
-  </span>
-</template>
-
-
 <template name="playlistItems">
   <div id="playlistItems">
     {{#each items}}
     <div  class="playlistItem" 
-          data-id="{{_id}}">
+          data-id="{{_id}}"
+          id="{{_id}}">
       <span class="name">{{name}}</span>
-      <span class="background" style="width:{{needlePosition}}px">&nbsp;</span>
+        <span class="background" style="width:{{needlePosition _id}}px"></span>
     </div>
     {{/each}}
   </div>
