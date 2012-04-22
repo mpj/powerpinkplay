@@ -85,7 +85,6 @@ if (Meteor.is_client) {
     'click .playPause': function(e) {
       e.preventDefault();
 
-      
       if (isPlaying())
         pause();
       else {
@@ -96,13 +95,13 @@ if (Meteor.is_client) {
 
   Template.createPlayList.events = {
     'click .do' : function (e) {
-      var playListName = $('#createPlayListView .name').val();
-      if (playListName.length == 0 ) return;
-      var playListNameSimple = playListName.replace(" ", "").toLowerCase();
-      Meteor.router.navigate("p/" + playListNameSimple + "/", {trigger: true});
+      var playlistName = $('#createPlayListView .name').val();
+      if (playlistName.length == 0 ) return;
+      var playlistNameSimple = playlistName.replace(" ", "").toLowerCase();
+      Meteor.router.navigate("p/" + playlistNameSimple + "/", {trigger: true});
       var id = Playlists.insert({ 
-        name: playListName, 
-        name_simple: playListNameSimple 
+        name: playlistName, 
+        name_simple: playlistNameSimple 
       });
     }
   };
