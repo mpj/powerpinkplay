@@ -40,9 +40,9 @@ if (Meteor.is_client) {
     return !!currentPlaylist() ? currentPlaylist().name : '';
   }
 
-  Template.playlistItems.needlePosition = function(id) {
+  Template.playlistItems.needlePosition = function() {
 
-    var item = PlaylistItems.findOne(id),
+    var item = this,
         now = Number(new Date()),
         base = 500;
 
