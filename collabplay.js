@@ -1,6 +1,8 @@
 var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items");
 
+
+var SCRUBBER_WIDTH = 500;
 if (Meteor.is_client) {
 
   var ClientRouter = Backbone.Router.extend({
@@ -43,8 +45,7 @@ if (Meteor.is_client) {
   Template.playlistItems.needlePosition = function() {
 
     var item = this,
-        now = Number(new Date()),
-        base = 500;
+        now = Number(new Date());
 
     if (!item || item.position == null) return 0;
 
@@ -65,7 +66,7 @@ if (Meteor.is_client) {
       },250);
     }
 
-    return Math.floor(base * progress);
+    return Math.floor(SCRUBBER_WIDTH * progress);
   }
 
   Template.playlistItems.events = {
@@ -73,7 +74,9 @@ if (Meteor.is_client) {
       
       e.preventDefault();
       var id = $(e.currentTarget).attr("data-id");
-      playPauseItem(id);
+
+      var relativeX = e.clientX - e.currentTarget.offsetLeft;
+      playPauseItem(id, relativeX);
     }
   }
 
@@ -127,7 +130,7 @@ if (Meteor.is_client) {
     
 }
 
-function playPauseItem(id) {
+function playPauseItem(id, relativeXClicked) {
   var item = PlaylistItems.findOne(id);
   var now = Number(new Date());
 
@@ -147,8 +150,11 @@ function playPauseItem(id) {
   } else {
     // Has a .position, but not .playing_since, that 
     // means it's paused. Start playing it again.
+    var progress = relativeXClicked /  SCRUBBER_WIDTH;
+    console.log("relativeXClicked", relativeXClicked)
     PlaylistItems.update(item._id, { $set: {
-      playing_since: now 
+      playing_since: now,
+      position: item.duration * progress,
     } });
 
   }
