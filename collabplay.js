@@ -51,25 +51,31 @@ if (Meteor.is_client) {
   }
 
 
-  Template.playlistHeader.needlePosition = function() {
+  Template.playlistItems.needlePosition = function() {
    
-    
     var playPos = getPlaypos();
     if (playPos == 0) return 0;
-    
-    var ctx = Meteor.deps.Context.current;
-    setTimeout(function() {
-      ctx.invalidate();
-    },250);
 
-    return playPos;
+    var duration = getDurationByHref(currentPlaylist().playing_track);
+    console.log("duration", duration)
+    var percent = playPos / duration;
+
+    if (isPlaying) { 
+      var ctx = Meteor.deps.Context.current;
+      setTimeout(function() {
+        ctx.invalidate();
+      },250);
+    }
+    
+    var base = 500;
+    return Math.floor(base * percent);
   }
 
   Template.playlistItems.events = {
     'click .playlistItem': function(e) {
       
       e.preventDefault();
-      play($(e.target).attr('data-href'), 0);
+      play($(e.currentTarget).attr('data-href'), 0);
     }
   }
 
@@ -155,6 +161,7 @@ function getPlaypos() {
 }
 
 function play(href, fromPos) {
+  if (!href) throw new Error("Must provide href!")
   if (!fromPos == null) fromPos = getPlaypos();
   changeCurrentPlayList({
     playing_at:     Number(new Date()),

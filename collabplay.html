@@ -15,8 +15,6 @@
   </div>  
 </template>
 
-
-
 <template name="playlist">
   <div id="playlistView" class="{{viewClass}}">
     {{> playlistHeader}}
@@ -29,7 +27,6 @@
 <template name="playlistHeader">
   <span class="wrapper">
     <h1>{{playlistName}}</h1>
-    <h2>{{needlePosition}}</h2>
   </span>
 </template>
 
@@ -46,8 +43,10 @@
     {{#each items}}
     <div  class="playlistItem" 
           data-href="{{href}}">
-      {{name}}
+      <span class="name">{{name}}</span>
+      <span class="background" style="width:{{needlePosition}}px">&nbsp;</span>
     </div>
     {{/each}}
   </div>
 </template>
+

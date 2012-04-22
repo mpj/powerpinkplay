@@ -13,9 +13,8 @@ body {
 }
 
 #playlistView .new { 
-	width: 500px;
+	width: 490px; /* -10 to compensate for border and padding */
 	font-size: 18px;
-	padding: 8px;
 }
 
 #playlistView .play {
@@ -27,28 +26,35 @@ body {
 #playlistView h1 { margin-bottom: 20px;}
 .playlistItem { 
 	display: inline-block;
-	padding: 8px;
+	position: relative;
 	background-color: #B7C7B8;
 	clear: both;
 	width: 500px;
+	height: 30px;
 	margin-bottom: 15px;
 	font-size: 18px;
 	text-align: left;
 }
-
-.playlistItem.active { 
-	background-color: #00AD0E;
+.playlistItem .name {
+	position: absolute;
+	z-index: 2;
 	color: white;
+	top: 5px;
+	left: 10px;
+}
+.playlistItem .background {
+	position: absolute;
+	width: 40%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-color: #00AD0E;
+	z-index: 1;
 }
 
-.playlistItem:nth-child(1) {
-	background-color: #00AD0E;
-	color: white;
-}
 
 .typeahead.dropdown-menu {
 	font-size: 18px;
-	padding: 8px;
 	width: 500px;
 	overflow: hidden;
 	text-align: left;
