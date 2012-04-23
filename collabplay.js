@@ -87,59 +87,61 @@ if (Meteor.is_client) {
     'click .playlistItem .container': function(e) {
       
       e.preventDefault();
+
       var $container = $(e.currentTarget);
       var offsetLeft = $container.offset().left;
       var id = $container.parent().attr("id");
-      var now = Number(new Date());
       var item = PlaylistItems.findOne(id);
       var relativeX = e.clientX - offsetLeft;
       var progress = relativeX / SCRUBBER_WIDTH;
       
-      // If this item is not active, and another is, clear it.
-      if (activeItem())
-          PlaylistItems.update(activeItem()._id, 
-            { $set: { position: null, playing_since: null } })
-
-      PlaylistItems.update(item._id, { $set: {
-        playing_since: now,
-        position: item.duration * progress
-      } });
+      play(item, progress)
 
     },
 
     'click .playlistItem .playPauseIcon': function(e) {
       e.preventDefault();
-      Meteor.flush()
 
       var id = $(e.currentTarget).parent().attr("id");
       var item = PlaylistItems.findOne(id);
 
-      var now = Number(new Date());
-
-      if (item.position == null) {
-        // New item, remove the active status of any old item.
-        if(activeItem())
-          PlaylistItems.update(activeItem()._id, { $set: { position: null, playing_since: null } })
-
-        PlaylistItems.update(item._id, { $set: { 
-          position: 0, playing_since: now 
-        } });
-      } else if (item.playing_since) {
-        // Is playing, pause it at current position.
-        PlaylistItems.update(item._id, { $set: {
-          position: now - item.playing_since + item.position, 
-          playing_since: null 
-        } });
-      } else {
-        // Has a .position, but not .playing_since, that 
-        // means it's paused. Start playing it again.
-        PlaylistItems.update(item._id, { $set: {
-          playing_since: now
-        } });
-
-      }
-
+      if (isPlaying(item))
+        pause(item);
+      else
+        play(item);
     }
+  }
+
+  function pause(playlistItem) {
+    var pli = playlistItem;
+    if (!isPlaying(pli)) return;
+
+    var now = Number(new Date());
+    PlaylistItems.update(pli._id, { $set: {
+      position: now - pli.playing_since + pli.position, 
+      playing_since: null 
+    } });
+  }
+
+  function play(playlistItem, progress) {
+    var pli = playlistItem;
+
+    progress = progress || pli.position / pli.duration;
+    clearPlayState(currentPlaylist());
+
+    var now = Number(new Date());
+    PlaylistItems.update(pli._id, { $set: {
+      playing_since: now,
+      position: pli.duration * progress
+    } });
+  }
+
+  function clearPlayState(playlist) {
+    PlaylistItems.update(
+      { playlist_id: playlist._id }, 
+      { $set: { playing_since: null, position: null } }, 
+      { multi: true }
+    )
   }
 
 
@@ -192,55 +194,12 @@ if (Meteor.is_client) {
     
 }
 
-function playPauseItem(id, relativeXClicked) {
-  var item = PlaylistItems.findOne(id);
-  var now = Number(new Date());
-
-  if (item.position == null) {
-    // New item, remove the active status of the old item.
-    if(activeItem())
-      PlaylistItems.update(activeItem()._id, { $set: { position: null, playing_since: null } })
-    PlaylistItems.update(item._id, { $set: { 
-      position: 0, playing_since: now 
-    } });
-  } else if (item.playing_since) {
-    // Is playing, pause it at current position.
-    PlaylistItems.update(item._id, { $set: {
-      position: now - item.playing_since + item.position, 
-      playing_since: null 
-    } });
-  } else {
-    // Has a .position, but not .playing_since, that 
-    // means it's paused. Start playing it again.
-    var progress = relativeXClicked /  SCRUBBER_WIDTH;
-    PlaylistItems.update(item._id, { $set: {
-      playing_since: now,
-      position: item.duration * progress,
-    } });
-
-  }
-
-}
-
-function activeItem() {
-  return PlaylistItems.findOne({ 
-    playlist_id: currentPlaylist()._id,
-    position: { $gte: 0 }
-  });
-}
 
 function currentPlaylist() {
   return Playlists.findOne({ 
     name_simple: 
       Session.get('currentPlayListSimpleName')
   });
-}
-
-
-function getDurationByHref(href) {
-  var playlistItem = PlaylistItems.findOne({ href: href});
-  if (!playlistItem) return 0;
-  return playlistItem.duration * 1000;
 }
 
 
