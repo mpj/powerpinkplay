@@ -29,7 +29,6 @@ function checkForSkipping(playlistItemId) {
   	var isPastEnd = !!pli.playing_since &&
   					((Number(new Date()) - pli.playing_since + pli.position)) > pli.duration;
     if(isPastEnd) {
-    	PlaylistItems.update(pli._id, { $set: { playing_since: null, position: null } });
 		var nextSibling = findNextSibling(pli);
 		if (nextSibling) Player.play(nextSibling);
 		
