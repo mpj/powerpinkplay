@@ -43,21 +43,29 @@ if (Meteor.is_client) {
   }
 
   Template.playlistItems.playPauseIconClass = function() {
-
-    var now = Number(new Date());
-
-    var isPlaying = !!this.playing_since && 
-                    this.position + now - this.playing_since < this.duration
-
-    return isPlaying ? 'icon-pause' : 'icon-play';
+    return isPlaying(this) ? 'icon-pause' : 'icon-play';
   }
 
   Template.playlistItems.needlePosition = function() {
 
-    var item = this,
+    var progress = getProgress(this);
+    if (progress == 0) return 0;
+    
+    if (isPlaying(this)) { 
+      var ctx = Meteor.deps.Context.current;
+      setTimeout(function() {
+        ctx.invalidate();
+      },250);
+    }
+
+    return Math.floor(SCRUBBER_WIDTH * progress);
+  }
+
+  function getProgress(playlistItem) {
+    var item = playlistItem,
         now = Number(new Date());
 
-    if (!item || item.position == null) return 0;
+    if (item.position == null) return 0;
 
     var currentPosition;
     if (item.playing_since)
@@ -66,17 +74,13 @@ if (Meteor.is_client) {
       currentPosition = item.position;
 
     var progress = currentPosition / item.duration;
-    if (progress > 1)
-      return 0;
+    if (progress > 1) return 0;
+    return progress;
+  }
 
-    if (!!item.playing_since) { 
-      var ctx = Meteor.deps.Context.current;
-      setTimeout(function() {
-        ctx.invalidate();
-      },250);
-    }
-
-    return Math.floor(SCRUBBER_WIDTH * progress);
+  function isPlaying(playlistItem) {
+    if (!playlistItem.playing_since) return false;
+    return getProgress(playlistItem) < 1;
   }
 
   Template.playlistItems.events = {
