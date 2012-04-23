@@ -7,7 +7,7 @@ if (Meteor.is_client) {
 
   var ClientRouter = Backbone.Router.extend({
       routes: {
-          "p/:simple_name/" :       "getPlayListBySimpleName"
+          "p/:simple_name/": "getPlayListBySimpleName"
       },
 
       getPlayListBySimpleName: function( simpleName ) {
@@ -43,7 +43,13 @@ if (Meteor.is_client) {
   }
 
   Template.playlistItems.playPauseIconClass = function() {
-    return !!this.playing_since ? 'icon-pause' : 'icon-play';
+
+    var now = Number(new Date());
+
+    var isPlaying = !!this.playing_since && 
+                    this.position + now - this.playing_since < this.duration
+
+    return isPlaying ? 'icon-pause' : 'icon-play';
   }
 
   Template.playlistItems.needlePosition = function() {
@@ -161,7 +167,7 @@ if (Meteor.is_client) {
           for (var i=0;i<data.tracks.length;i++) {
             var track = data.tracks[i];
             simpleTracks.push({
-              name:   track.name,
+              name:   track.name + " (" + track.artists[0].name + ")",
               href:   track.href,
               duration: track.length*1000
             });
@@ -232,7 +238,6 @@ function getDurationByHref(href) {
   if (!playlistItem) return 0;
   return playlistItem.duration * 1000;
 }
-
 
 
 if (Meteor.is_server) {
