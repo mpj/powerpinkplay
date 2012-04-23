@@ -11,23 +11,24 @@ var handle = query.observe({
   	if (!pli.playing_since) return;
 
 	var timeleft = pli.duration - pli.position;
-	var timeSinceCheck = Number(new Date()) - pli.playing_since;
+	var timePassedSinceStart = Number(new Date()) - pli.playing_since;
 
 	var fiber = Fiber(function() {
-		checkForSkipping(pli);
+		checkForSkipping(pli._id);
 	});
 
 	setTimeout(function() { fiber.run() },
-		timeleft - timeSinceCheck + 1);
+		timeleft - timePassedSinceStart + 1);
 
   }
 });
 
-function checkForSkipping(playlistItem) {
-	var pli = playlistItem;
-  	
-  	var hasReachedEnd = (Number(new Date()) - pli.playing_since + pli.position) > pli.duration;
-    if(hasReachedEnd) {
+function checkForSkipping(playlistItemId) {
+	var pli = PlaylistItems.findOne(playlistItemId);
+ 
+  	var isPastEnd = !!pli.playing_since &&
+  					((Number(new Date()) - pli.playing_since + pli.position)) > pli.duration;
+    if(isPastEnd) {
     	PlaylistItems.update(pli._id, { $set: { playing_since: null, position: null } });
 		var nextSibling = findNextSibling(pli);
 		if (nextSibling) Player.play(nextSibling);
