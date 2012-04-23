@@ -19,8 +19,8 @@ Player.prototype = {
 	},
 
 	isPlaying: function(playlistItem) {
-	  if (!playlistItem.playing_since) return false;
-	  return this.getProgress(playlistItem) < 1;
+	  return !!playlistItem.playing_since && 
+	  	     !!this.getProgress(playlistItem);
 	}, 
 
 	pause: function(playlistItem) {
@@ -28,7 +28,7 @@ Player.prototype = {
 	  if (!this.isPlaying(pli)) return;
 
 	  PlaylistItems.update(pli._id, { $set: {
-	    position: this._now - pli.playing_since + pli.position, 
+	    position: Number(new Date()) - pli.playing_since + pli.position, 
 	    playing_since: null 
 	  } });
 	},
