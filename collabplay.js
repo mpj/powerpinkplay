@@ -42,6 +42,10 @@ if (Meteor.is_client) {
     return !!currentPlaylist() ? currentPlaylist().name : '';
   }
 
+  Template.playlistItems.playPauseIconClass = function() {
+    return !!this.playing_since ? 'icon-pause' : 'icon-play';
+  }
+
   Template.playlistItems.needlePosition = function() {
 
     var item = this,
@@ -70,12 +74,13 @@ if (Meteor.is_client) {
   }
 
   Template.playlistItems.events = {
-    'click .playlistItem': function(e) {
+    'click .playlistItem .container': function(e) {
       
       e.preventDefault();
-      var id = $(e.currentTarget).attr("data-id");
-
-      var relativeX = e.clientX - e.currentTarget.offsetLeft;
+      var $container = $(e.currentTarget);
+      var offsetLeft = $container.offset().left;
+      var id = $container.parent().attr("data-id");
+      var relativeX = e.clientX - offsetLeft;
       playPauseItem(id, relativeX);
     }
   }
@@ -151,7 +156,6 @@ function playPauseItem(id, relativeXClicked) {
     // Has a .position, but not .playing_since, that 
     // means it's paused. Start playing it again.
     var progress = relativeXClicked /  SCRUBBER_WIDTH;
-    console.log("relativeXClicked", relativeXClicked)
     PlaylistItems.update(item._id, { $set: {
       playing_since: now,
       position: item.duration * progress,

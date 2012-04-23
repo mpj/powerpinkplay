@@ -35,8 +35,14 @@
     <div  class="playlistItem" 
           data-id="{{_id}}"
           id="{{_id}}">
-      <span class="name">{{name}}</span>
-        <span class="background" style="width:{{needlePosition}}px"></span>
+      <span class="playPauseIcon">
+        <i class="{{playPauseIconClass}}" />
+      </span>
+      <span class="container">
+        <span class="name">{{name}}</span>
+        <span class="scrubber" style="width:{{needlePosition}}px"></span>
+        <span class="background"></span>
+      </span>
     </div>
     {{/each}}
   </div>
