@@ -27,18 +27,21 @@ body {
 .playlistItem { 
 	display: inline-block;
 	position: relative;
-	left: -25px;
 	clear: both;
 	width: 525px;
+	left: -25px;
 	height: 30px;
 	margin-bottom: 15px;
 	font-size: 18px;
 	text-align: left;
 }
 .playlistItem .playPauseIcon {
-	position: relative;
+	position: absolute;
+	display: inline-block;
+	left: 0;
 	width: 25px;
 	height: 30px;
+	cursor: pointer;
 }
 .playlistItem .playPauseIcon i {
 	position: absolute;
@@ -46,18 +49,21 @@ body {
 }
 .playlistItem .container {
 	position: absolute;
+	display: inline-block;
 	width: 500px;
+	left: 25px;
+	background-color: red;
+	cursor: default;
 }
 .playlistItem .name {
 	position: absolute;
 	z-index: 3;
 	color: white;
 	top: 5px;
-	left: 35px;
+	left: 10px;
 }
 .playlistItem .scrubber {
 	position: absolute;
-	left: 25px;
 	height: 30px;
 	top: 0;
 	background-color: #00AD0E;
@@ -68,7 +74,6 @@ body {
 	width: 500px;
 	height: 30px;
 	position: absolute;
-	left: 25px;
 	z-index: 1;
 }
 

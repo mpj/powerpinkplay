@@ -79,9 +79,56 @@ if (Meteor.is_client) {
       e.preventDefault();
       var $container = $(e.currentTarget);
       var offsetLeft = $container.offset().left;
-      var id = $container.parent().attr("data-id");
+      var id = $container.parent().attr("id");
+      var now = Number(new Date());
+      var item = PlaylistItems.findOne(id);
       var relativeX = e.clientX - offsetLeft;
-      playPauseItem(id, relativeX);
+      var progress = relativeX / SCRUBBER_WIDTH;
+      
+      // If this item is not active, and another is, clear it.
+      if (activeItem())
+          PlaylistItems.update(activeItem()._id, 
+            { $set: { position: null, playing_since: null } })
+
+      PlaylistItems.update(item._id, { $set: {
+        playing_since: now,
+        position: item.duration * progress
+      } });
+
+    },
+
+    'click .playlistItem .playPauseIcon': function(e) {
+      e.preventDefault();
+      Meteor.flush()
+
+      var id = $(e.currentTarget).parent().attr("id");
+      var item = PlaylistItems.findOne(id);
+
+      var now = Number(new Date());
+
+      if (item.position == null) {
+        // New item, remove the active status of any old item.
+        if(activeItem())
+          PlaylistItems.update(activeItem()._id, { $set: { position: null, playing_since: null } })
+
+        PlaylistItems.update(item._id, { $set: { 
+          position: 0, playing_since: now 
+        } });
+      } else if (item.playing_since) {
+        // Is playing, pause it at current position.
+        PlaylistItems.update(item._id, { $set: {
+          position: now - item.playing_since + item.position, 
+          playing_since: null 
+        } });
+      } else {
+        // Has a .position, but not .playing_since, that 
+        // means it's paused. Start playing it again.
+        PlaylistItems.update(item._id, { $set: {
+          playing_since: now
+        } });
+
+      }
+
     }
   }
 

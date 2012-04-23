@@ -33,12 +33,11 @@
   <div id="playlistItems">
     {{#each items}}
     <div  class="playlistItem" 
-          data-id="{{_id}}"
           id="{{_id}}">
-      <span class="playPauseIcon">
+      <span class="playPauseIcon" id="playPauseIcon{{_id}}">
         <i class="{{playPauseIconClass}}" />
       </span>
-      <span class="container">
+      <span class="container" id="container{{_id}}">
         <span class="name">{{name}}</span>
         <span class="scrubber" style="width:{{needlePosition}}px"></span>
         <span class="background"></span>
