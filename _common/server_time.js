@@ -4,7 +4,29 @@ ServerTime = function() {
 
 ServerTime.prototype = {
 	
-	updateTime: function(serverEpochNow, requestTime) {
+	startSynchronizing: function() {
+		
+		this._synchronize();
+	    
+	    // Re-sync time every 2 minutes, in case the user
+	    // keeps the window open a long time.
+	    var that = this;
+	    Meteor.setInterval(function() {
+	    	that._synchronize.call(that);
+	    }, 2*60*100); 
+	},
+
+	_synchronize: function() {
+		var callBegin = Number(new Date());
+		var that = this;
+	    Meteor.call('serverTime', function(error, result) {
+	      var callEnd = Number(new Date());
+	      var requestTime = callEnd - callBegin;
+	      that._updateTime(result, requestTime);
+	    });
+	},
+
+	_updateTime: function(serverEpochNow, requestTime) {
 		this._offSet = Number(new Date()) - serverEpochNow;
 		if (requestTime) {
 			// Compensate for latency. We're 
