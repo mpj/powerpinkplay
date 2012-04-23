@@ -1,6 +1,13 @@
 var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items"),
-    Player = new Player()
+    serverTime = new ServerTime,
+    player = new Player(serverTime);
+
+Meteor.methods({
+  serverTime: function () {
+    return Number(new Date());
+  }
+});
 
 var query = PlaylistItems.find({});
 
@@ -17,7 +24,7 @@ var handle = query.observe({
 		checkForSkipping(pli._id);
 	});
 
-	setTimeout(function() { fiber.run() },
+	Meteor.setTimeout(function() { fiber.run() },
 		timeleft - timePassedSinceStart + 1);
 
   }
@@ -30,7 +37,7 @@ function checkForSkipping(playlistItemId) {
   					((Number(new Date()) - pli.playing_since + pli.position)) > pli.duration;
     if(isPastEnd) {
 		var nextSibling = findNextSibling(pli);
-		if (nextSibling) Player.play(nextSibling);
+		if (nextSibling) player.play(nextSibling);
 		
     }
 }

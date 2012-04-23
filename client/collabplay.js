@@ -1,9 +1,9 @@
 var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items"),
-    Player = new Player();
-
-
-var SCRUBBER_WIDTH = 500;
+    serverTime = new ServerTime(),
+    player = new Player(serverTime),
+    
+    SCRUBBER_WIDTH = 500;
 
 var ClientRouter = Backbone.Router.extend({
     routes: {
@@ -33,7 +33,7 @@ Template.playlistItems.items = function () {
 
   if (!currentPlaylist()) return [];
   
-  setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
+  Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
   return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
 }
 
@@ -43,17 +43,17 @@ Template.playlistHeader.playlistName = function () {
 }
 
 Template.playlistItems.playPauseIconClass = function() {
-  return Player.isPlaying(this) ? 'icon-pause' : 'icon-play';
+  return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
 }
 
 Template.playlistItems.needlePosition = function() {
 
-  var progress = Player.getProgress(this);
+  var progress = player.getProgress(this);
   if (progress == 0) return 0;
   
-  if (Player.isPlaying(this)) { 
+  if (player.isPlaying(this)) { 
     var ctx = Meteor.deps.Context.current;
-    setTimeout(function() {
+    Meteor.setTimeout(function() {
       ctx.invalidate();
     }, 250);
   }
@@ -74,7 +74,7 @@ Template.playlistItems.events = {
     var relativeX = e.clientX - offsetLeft;
     var progress = relativeX / SCRUBBER_WIDTH;
     
-    Player.play(item, progress);
+    player.play(item, progress);
 
 
   },
@@ -85,10 +85,10 @@ Template.playlistItems.events = {
     var id = $(e.currentTarget).parents('.playlistItem').attr("id");
     var item = PlaylistItems.findOne(id);
 
-    if (Player.isPlaying(item))
-      Player.pause(item);
+    if (player.isPlaying(item))
+      player.pause(item);
     else
-      Player.play(item);
+      player.play(item);
   }
 }
 
@@ -150,3 +150,11 @@ function currentPlaylist() {
       Session.get('currentPlayListSimpleName')
   });
 }
+
+
+Meteor.startup(function() {
+  Meteor.call('serverTime', function(error, result) {
+    serverTime.updateTime(result);
+  });
+});
+

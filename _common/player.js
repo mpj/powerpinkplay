@@ -1,4 +1,6 @@
-Player = function() { };
+Player = function(serverTime) {
+	this._serverTime = serverTime;
+};
 
 Player.prototype = {
 
@@ -9,7 +11,7 @@ Player.prototype = {
 
 	  var currentPosition;
 	  if (item.playing_since)
-	    currentPosition = Number(new Date()) - item.playing_since + item.position;
+	    currentPosition = this._serverTime.epoch() - item.playing_since + item.position;
 	  else
 	    currentPosition = item.position;
 
@@ -28,7 +30,7 @@ Player.prototype = {
 	  if (!this.isPlaying(pli)) return;
 
 	  PlaylistItems.update(pli._id, { $set: {
-	    position: Number(new Date()) - pli.playing_since + pli.position, 
+	    position: this._serverTime.epoch() - pli.playing_since + pli.position, 
 	    playing_since: null 
 	  } });
 	},
@@ -43,7 +45,7 @@ Player.prototype = {
 	  		progress = 0;
 	    
 	  PlaylistItems.update(pli._id, { $set: {
-	    playing_since: Number(new Date()),
+	    playing_since: this._serverTime.epoch(),
 	    position: pli.duration * progress
 	  } });
 
