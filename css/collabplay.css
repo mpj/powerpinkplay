@@ -4,6 +4,7 @@
 
 body {
 	text-align: center;
+	cursor: default;
 }
 #playlistView {
 	display: inline-block;
@@ -34,6 +35,7 @@ body {
 	margin-bottom: 15px;
 	font-size: 18px;
 	text-align: left;
+	cursor: default;
 }
 .playlistItem .playPauseIcon {
 	position: absolute;
@@ -51,25 +53,27 @@ body {
 	position: absolute;
 	display: inline-block;
 	width: 500px;
+	height: 100%;
 	left: 25px;
 	background-color: red;
-	cursor: default;
 }
-.playlistItem .name {
+
+.playlistItem .container .name {
 	position: absolute;
 	z-index: 3;
 	color: white;
 	top: 5px;
 	left: 10px;
+
 }
-.playlistItem .scrubber {
+.playlistItem .container .scrubber {
 	position: absolute;
 	height: 30px;
 	top: 0;
 	background-color: #00AD0E;
 	z-index: 2;
 }
-.playlistItem .background {
+.playlistItem .container .background {
 	background-color: #B7C7B8;
 	width: 500px;
 	height: 30px;
@@ -84,3 +88,9 @@ body {
 	text-align: left;
 }
 
+.clickArea {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 999;
+}

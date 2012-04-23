@@ -2,6 +2,10 @@ var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items"),
     Player = new Player();
 
+$(document).click(function() {
+  //Meteor.flush();
+});
+
 var SCRUBBER_WIDTH = 500;
 
 var ClientRouter = Backbone.Router.extend({
@@ -54,7 +58,7 @@ Template.playlistItems.needlePosition = function() {
     var ctx = Meteor.deps.Context.current;
     setTimeout(function() {
       ctx.invalidate();
-    }, 1000);
+    }, 250);
   }
 
   return Math.floor(SCRUBBER_WIDTH * progress);
@@ -62,13 +66,13 @@ Template.playlistItems.needlePosition = function() {
 
 
 Template.playlistItems.events = {
-  'click .playlistItem .container': function(e) {
-    
+  'click .playlistItem .container .clickArea': function(e) {
+  
     e.preventDefault();
 
     var $container = $(e.currentTarget);
     var offsetLeft = $container.offset().left;
-    var id = $container.parent().attr("id");
+    var id = $container.parents('.playlistItem').attr("id");
     var item = PlaylistItems.findOne(id);
     var relativeX = e.clientX - offsetLeft;
     var progress = relativeX / SCRUBBER_WIDTH;
@@ -78,10 +82,10 @@ Template.playlistItems.events = {
 
   },
 
-  'click .playlistItem .playPauseIcon': function(e) {
+  'click .playlistItem .playPauseIcon .clickArea': function(e) {
     e.preventDefault();
 
-    var id = $(e.currentTarget).parent().attr("id");
+    var id = $(e.currentTarget).parents('.playlistItem').attr("id");
     var item = PlaylistItems.findOne(id);
 
     if (Player.isPlaying(item))
