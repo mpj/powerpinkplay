@@ -153,8 +153,11 @@ function currentPlaylist() {
 
 
 Meteor.startup(function() {
+  var callBegin = Number(new Date());
   Meteor.call('serverTime', function(error, result) {
-    serverTime.updateTime(result);
+    var callEnd = Number(new Date());
+    var requestTime = callEnd - callBegin;
+    serverTime.updateTime(result, requestTime);
   });
 });
 

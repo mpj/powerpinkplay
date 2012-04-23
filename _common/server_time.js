@@ -4,11 +4,17 @@ ServerTime = function() {
 
 ServerTime.prototype = {
 	
-	updateTime: function(serverEpochNow) {
+	updateTime: function(serverEpochNow, requestTime) {
 		this._offSet = Number(new Date()) - serverEpochNow;
+		if (requestTime) {
+			// Compensate for latency. We're 
+			// guessing that the trip to server is
+			// half of the request time.
+			this._offSet -= requestTime/2;
+		}
 	},
 
-	epoch: function() {
+	epoch: function() { 	
 		return Number(new Date()) - this._offSet;
 	}
 }
