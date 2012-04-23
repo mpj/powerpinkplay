@@ -34,10 +34,10 @@
     {{#each items}}
     <div  class="playlistItem" 
           id="{{_id}}">
-      <span class="playPauseIcon" id="playPauseIcon{{_id}}">
+      <span class="playPauseIcon" id="playPauseIcon_{{_id}}">
         <i class="{{playPauseIconClass}}" />
       </span>
-      <span class="container" id="container{{_id}}">
+      <span class="container" id="container_{{_id}}">
         <span class="name">{{name}}</span>
         <span class="scrubber" style="width:{{needlePosition}}px"></span>
         <span class="background"></span>
