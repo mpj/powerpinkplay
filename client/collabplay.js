@@ -2,9 +2,6 @@ var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items"),
     Player = new Player();
 
-$(document).click(function() {
-  //Meteor.flush();
-});
 
 var SCRUBBER_WIDTH = 500;
 
