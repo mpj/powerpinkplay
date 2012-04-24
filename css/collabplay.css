@@ -29,7 +29,7 @@ body {
 	display: inline-block;
 	position: relative;
 	clear: both;
-	width: 525px;
+	width: 550px;
 	left: -25px;
 	height: 30px;
 	margin-bottom: 15px;
@@ -79,6 +79,17 @@ body {
 	height: 30px;
 	position: absolute;
 	z-index: 1;
+}
+.playlistItem .moveIcon {
+	position: absolute;
+	right: 0;
+	width: 25px;
+	height: 100%;
+}
+.playlistItem .moveIcon i {
+	position: absolute;
+	left: 10px;
+	top: 7px;
 }
 
 .typeahead.dropdown-menu {

@@ -32,7 +32,6 @@ Template.playlist.viewClass = function () {
 Template.playlistItems.items = function () {
 
   if (!currentPlaylist()) return [];
-  
   Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
   return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
 }
@@ -76,7 +75,6 @@ Template.playlistItems.events = {
     
     player.play(item, progress);
 
-
   },
 
   'click .playlistItem .playPauseIcon .clickArea': function(e) {
@@ -89,6 +87,28 @@ Template.playlistItems.events = {
       player.pause(item);
     else
       player.play(item);
+  },
+
+  'mousedown .playlistItem .moveIcon .clickArea': function(e) {
+    e.preventDefault();
+
+    
+    var $pli = $(e.currentTarget).parents('.playlistItem');
+    var startY = e.clientY,
+        startX = e.clientX,
+        originalX = $pli.offset().left,
+        originalY = $pli.offset().top;
+
+    $(document).mousemove(function(e) {
+      var deltaY = e.clientY - startY;
+      var deltaX = e.clientX - startX;
+      $pli.offset({ top: originalY+deltaY, left: originalX+deltaX});
+    });
+
+    $(document).mouseup(function(e) {
+      $(document).unbind('mousemove');
+      $pli.offset({ top: originalY, left: originalX})
+    })
   }
 }
 
