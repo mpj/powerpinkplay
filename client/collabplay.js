@@ -33,7 +33,8 @@ Template.playlistItems.items = function () {
 
   if (!currentPlaylist()) return [];
   Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
-  return PlaylistItems.find({ playlist_id: currentPlaylist()._id}).fetch()
+  var opts = { sort: { order: 1 }};
+  return PlaylistItems.find({ playlist_id: currentPlaylist()._id }, opts).fetch()
 }
 
 
@@ -97,19 +98,49 @@ Template.playlistItems.events = {
     var startY = e.clientY,
         startX = e.clientX,
         originalX = $pli.offset().left,
-        originalY = $pli.offset().top;
+        originalY = $pli.offset().top,
+        hovering  = null;
+
+    // TODO: Instead of hover, make use of
+    // document.elementFromPoint
+    $('.playlistItem').not("#"+$pli.attr('id')).hover(
+      function() {
+        $(this).after('<div class="placeholder">adsdsd</div>');
+        hovering = this;
+      },  
+      function() {
+        $('.placeholder').remove();
+      }
+    );
 
     $(document).mousemove(function(e) {
       var deltaY = e.clientY - startY;
       var deltaX = e.clientX - startX;
       $pli.offset({ top: originalY+deltaY, left: originalX+deltaX});
+
     });
 
     $(document).mouseup(function(e) {
+      if (hovering) {
+        insertAfter($pli.attr('id'), hovering.id);
+        hovering = null;
+      }
+
       $(document).unbind('mousemove');
+      $('.playlistItem').unbind('hover')
+      $('.placeholder').remove();
       $pli.offset({ top: originalY, left: originalX})
     })
   }
+}
+
+function insertAfter(playlistItemId, afterPlaylistItemId) {
+  // TODO: assign order when playlistitems are created
+  console.log("insertAfter", playlistItemId, afterPlaylistItemId)
+  var target = PlaylistItems.findOne(afterPlaylistItemId);
+  PlaylistItems.update(playlistItemId, { $set: {
+    order: target.order + 0.01//0.000000000000000001
+  } });
 }
 
 
@@ -153,16 +184,20 @@ function attachTypeAhead() {
 
     onselect: function(simpleTrack) {
       simpleTrack.playlist_id = currentPlaylist()._id;
+      simpleTrack.order = getMaximumOrder(simpleTrack.playlist_id) + 1;
       PlaylistItems.insert(simpleTrack);
       $('#playlistView .new').val('').focus();
-
     }
   });
 
 }
   
 
-
+function getMaximumOrder(playlistId) {
+  var pli = PlaylistItems.findOne({ playlist_id: playlistId}, { sort: {order: -1}} );
+  if(!pli) return 0;
+  return pli.order;
+}
 
 function currentPlaylist() {
   return Playlists.findOne({ 
