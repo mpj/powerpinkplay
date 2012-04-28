@@ -1,9 +1,12 @@
-Template.playlistHeader.playlistName = function () {
-  return !!player.currentPlaylist() ? player.currentPlaylist().name : '';
-}
 
+
+// This view should only be visible if we have navigated to a playlist.
 Template.playlist.viewClass = function () {
   return player.currentPlaylist() ? '' : 'hidden';
+}
+
+Template.playlistHeader.playlistName = function () {
+  return !!player.currentPlaylist() ? player.currentPlaylist().name : '';
 }
 
 Template.playlistItems.items = function () {
@@ -11,6 +14,10 @@ Template.playlistItems.items = function () {
   Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
   return player.items(player.currentPlaylist());
 }
+
+
+// PlaylistItem
+// --------------------------------------------------------
 
 Template.playlistItem.playPauseIconClass = function() {
   return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
@@ -40,7 +47,7 @@ Template.playlistItem.events = {
         offsetLeft = $container.offset().left,
         relativeX = e.clientX - offsetLeft,
         progress = relativeX / $container.width(),
-        id = getId(e.target);
+        id = getDataId(e.target);
     
     player.play(id, progress);
   },
@@ -48,7 +55,7 @@ Template.playlistItem.events = {
   'click .playPauseIcon .clickArea': function(e) {
     e.preventDefault();
 
-    var id = getId(e.target);
+    var id = getDataId(e.target);
     if (player.isPlaying(id))
       player.pause(id);
     else
@@ -57,22 +64,20 @@ Template.playlistItem.events = {
 
   'mousedown .moveIcon .clickArea': function(e) {
     e.preventDefault();
-
+    Session.set('dragItemId', getDataId(e.target));
     Session.set('dragOriginX', e.clientX);
     Session.set('dragOriginY', e.clientY);
-    Session.set('draggedItemId', getId(e.target));
-
   }
 }
 
 $(document).mouseup(function(e) {
-  var afterId = hoveredItemId();
+  var afterId = getHoveredItemId();
   if (afterId)
-    player.move(Session.get('draggedItemId'), afterId);
+    player.move(Session.get('dragItemId'), afterId);
 
+  Session.set('dragItemId', null);
   Session.set('dragOriginX', null);
   Session.set('dragOriginY', null);
-  Session.set('draggedItemId', null);
 })
 
 $(document).mousemove(function(e) {
@@ -81,49 +86,55 @@ $(document).mousemove(function(e) {
 });
 
 
-Template.playlistItem.placeHolderClassBelow = function() {
-  return (this._id == hoveredItemId())  ? 'placeholder' : 'hidden';
-}
-
 Template.playlistItem.offsetX = function() {
-  if (this._id != Session.get('draggedItemId')) return 0;
-  return getDelta(Session.get('mouseX'), Session.get('dragOriginX'))
+  return calculateOffset(this._id, false)
 }
 
 Template.playlistItem.offsetY = function() {
-  if (this._id != Session.get('draggedItemId')) return 0;
-  return getDelta(Session.get('mouseY'), Session.get('dragOriginY'))
+  return calculateOffset(this._id, true)
 }
 
-function hoveredItemId() {
+function calculateOffset(itemId, vertical) {
+  if (itemId != Session.get('dragItemId')) return 0;
+  var xOrY = vertical ? "Y" : "X";
+  var delta = Session.get('mouse' + xOrY) - Session.get('dragOrigin' + xOrY);
+  return delta;
+}
+
+Template.playlistItem.placeHolderClassBelow = function() {
+  return this._id == getHoveredItemId() ? 'placeholder' : 'hidden';
+}
+
+function getHoveredItemId() {
   if (!Session.get('dragOriginX')) return null;
   var mx = Session.get('mouseX'),
       my = Session.get('mouseY'),
       hoveredId = null;
 
-  // TODO: Needs some kind of cache.
-  $('.playlistItem').not('#'+Session.get('draggedItemId')).each(function() {
+  var $staticItems = $('.playlistItem').not('#'+Session.get('dragItemId'));
+
+  $staticItems.each(function() {
     var offset = $(this).offset(),
         x1 = offset.left,
         y1 = offset.top,
         x2 = offset.left + $(this).width(),
         y2 = offset.top  + $(this).height(),
-        isInsideBox = !(mx < x1 || x2 < mx || my < y1 || y2 < my);
+        isInsideBox = my > y1 && my < y2 && mx > x1 && mx < x2;
     if(isInsideBox) {
       hoveredId = this.id;
       return;
     }
   })
+  var end = Number(new Date());
   return hoveredId;
 }
 
-function getId(element) {
-  return $(element).parents('.playlistItem').attr('id');
-}
-
-function getDelta(v1, v2) {
-  if (v1 == null || v2 == null) return 0;
-  return v1-v2;
+// Retrieves the database id for a PlaylistItem HTML element 
+// or one of it's children.
+function getDataId(element) {
+  var $parents = $(element).parents('.playlistItem');
+  if(!$parents.length) return element.id;
+  return $parents.attr('id');
 }
 
 function attachTypeAhead() {
@@ -154,5 +165,4 @@ function attachTypeAhead() {
       $('#playlistView .new').val('').focus();
     }
   });
-
 }
