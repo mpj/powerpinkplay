@@ -10,7 +10,7 @@
 <template name="createPlayList">
   <div id="createPlayListView" class="{{viewClass}}">
     <h1>Create a playlist</h1>
-    <input class="name" type="text" />
+    <input class="name" id="createPlayListName" type="text" />
     <input class="do" type="button" value="Create" />
   </div>  
 </template>
@@ -32,26 +32,30 @@
 <template name="playlistItems">
   <div id="playlistItems">
     {{#each items}}
-    <div  class="playlistItem" 
-          id="{{_id}}"
-          style="left:{{offsetX}}px;top:{{offsetY}}px">
-      <span class="playPauseIcon" id="playPauseIcon_{{_id}}">
-        <span class="clickArea" id="playPauseIcon_clickArea_{{_id}}"></span>
-        <i class="{{playPauseIconClass}}" />
-      </span>
-      <span class="container" id="container_{{_id}}">
-        <span class="clickArea" id="container_clickArea_{{_id}}"></span>
-        <span class="name">{{name}}</span>
-        <span class="scrubber" style="width:{{needlePosition}}px"></span>
-        <span class="background"></span>
-      </span>
-      <span class="moveIcon">
-        <span class="clickArea" id="moveIcon_clickArea_{{_id}}"></span>
-        <i class="icon-move" />
-      </span>
-    </div>
-    <div class="{{placeHolderClassBelow}}">XXXXXX</div>
+      {{> playlistItem }}
     {{/each}}
   </div>
+</template>
+
+<template name="playlistItem">
+  <div  class="playlistItem" 
+          id="{{_id}}"
+          style="left:{{offsetX}}px;top:{{offsetY}}px">
+    <span class="playPauseIcon" id="playPauseIcon_{{_id}}">
+      <span class="clickArea" id="playPauseIcon_clickArea_{{_id}}"></span>
+      <i class="{{playPauseIconClass}}" />
+    </span>
+    <span class="container" id="container_{{_id}}">
+      <span class="clickArea" id="container_clickArea_{{_id}}"></span>
+      <span class="name">{{name}}</span>
+      <span class="scrubber" style="width:{{needlePosition}}px"></span>
+      <span class="background"></span>
+    </span>
+    <span class="moveIcon">
+      <span class="clickArea" id="moveIcon_clickArea_{{_id}}"></span>
+      <i class="icon-move" />
+    </span>
+  </div>
+  <div class="{{placeHolderClassBelow}}">XXXXXX</div>
 </template>
 

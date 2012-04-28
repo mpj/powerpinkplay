@@ -2,7 +2,6 @@ var Playlists = new Meteor.Collection("playlists"),
     PlaylistItems = new Meteor.Collection("playlist_items"),
     serverTime = new ServerTime(),
     player = new Player(serverTime),
-    
     SCRUBBER_WIDTH = 500;
 
 var ClientRouter = Backbone.Router.extend({
@@ -21,33 +20,32 @@ Backbone.history.start({pushState: true});
 
 
 Template.createPlayList.viewClass = function () {
-  return currentPlaylist() ? 'hidden' : '';
+  return player.currentPlaylist() ? 'hidden' : '';
 }
 
 Template.playlist.viewClass = function () {
-  return currentPlaylist() ? '' : 'hidden';
+  return player.currentPlaylist() ? '' : 'hidden';
 }
 
 
 Template.playlistItems.items = function () {
 
-  if (!currentPlaylist()) return [];
+  if (!player.currentPlaylist()) return [];
   Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
   var opts = { sort: { order: 1 }};
-  return PlaylistItems.find({ playlist_id: currentPlaylist()._id }, opts).fetch()
+  return PlaylistItems.find({ playlist_id: player.currentPlaylist()._id }, opts).fetch()
 }
 
 
 Template.playlistHeader.playlistName = function () {
-
-  return !!currentPlaylist() ? currentPlaylist().name : '';
+  return !!player.currentPlaylist() ? player.currentPlaylist().name : '';
 }
 
-Template.playlistItems.playPauseIconClass = function() {
+Template.playlistItem.playPauseIconClass = function() {
   return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
 }
 
-Template.playlistItems.needlePosition = function() {
+Template.playlistItem.needlePosition = function() {
 
   var progress = player.getProgress(this);
   if (progress == 0) return 0;
@@ -63,32 +61,27 @@ Template.playlistItems.needlePosition = function() {
 }
 
 
-Template.playlistItems.events = {
+Template.playlistItem.events = {
   'click .playlistItem .container .clickArea': function(e) {
   
     e.preventDefault();
 
-    var $container = $(e.currentTarget);
-    var offsetLeft = $container.offset().left;
-    var id = $container.parents('.playlistItem').attr("id");
-    var item = PlaylistItems.findOne(id);
-    var relativeX = e.clientX - offsetLeft;
-    var progress = relativeX / SCRUBBER_WIDTH;
+    var $container = $(e.target).parents('.container'),
+        offsetLeft = $container.offset().left,
+        relativeX = e.clientX - offsetLeft,
+        progress = relativeX / SCRUBBER_WIDTH,
+        id = $container.parents('.playlistItem').attr("id");
     
-    player.play(item, progress);
-
+    player.play(id, progress);
   },
 
   'click .playlistItem .playPauseIcon .clickArea': function(e) {
     e.preventDefault();
-
-    var id = $(e.currentTarget).parents('.playlistItem').attr("id");
-    var item = PlaylistItems.findOne(id);
-
-    if (player.isPlaying(item))
-      player.pause(item);
+    var id = $(e.target).parents('.playlistItem').attr("id");
+    if (player.isPlaying(id))
+      player.pause(id);
     else
-      player.play(item);
+      player.play(id);
   },
 
   'mousedown .playlistItem .moveIcon .clickArea': function(e) {
@@ -105,7 +98,7 @@ Template.playlistItems.events = {
 $(document).mouseup(function(e) {
   var afterId = hoveredItemId();
   if (afterId)
-    insertAfter(Session.get('draggedItemId'), afterId);
+    player.move(Session.get('draggedItemId'), afterId);
 
   Session.set('dragOriginX', null);
   Session.set('dragOriginY', null);
@@ -118,16 +111,16 @@ $(document).mousemove(function(e) {
 });
 
 
-Template.playlistItems.placeHolderClassBelow = function() {
+Template.playlistItem.placeHolderClassBelow = function() {
   return (this._id == hoveredItemId())  ? 'placeholder' : 'hidden';
 }
 
-Template.playlistItems.offsetX = function() {
+Template.playlistItem.offsetX = function() {
   if (this._id != Session.get('draggedItemId')) return 0;
   return getDelta(Session.get('mouseX'), Session.get('dragOriginX'))
 }
 
-Template.playlistItems.offsetY = function() {
+Template.playlistItem.offsetY = function() {
   if (this._id != Session.get('draggedItemId')) return 0;
   return getDelta(Session.get('mouseY'), Session.get('dragOriginY'))
 }
@@ -151,8 +144,6 @@ function hoveredItemId() {
       return;
     }
   })
-  if (hoveredId)
-    console.log("Hovering", PlaylistItems.findOne(hoveredId).name)
   return hoveredId;
 }
 
@@ -161,44 +152,12 @@ function getDelta(v1, v2) {
   return v1-v2;
 }
 
-function insertAfter(playlistItemId, afterPlaylistItemId) {
-  
-
-  // Make this into a server queue
-  var pl = PlaylistItems.findOne(playlistItemId);
-  console.log(pl)
-  var others = PlaylistItems.find(
-      { playlist_id: pl.playlist_id, _id: { $ne: playlistItemId } },
-      { sort: {order: 1}}
-    ).fetch();
-
-  var setOrder = function(id, order) {
-    PlaylistItems.update(id, { $set: { order: order } });
-  }
-  
-  var i = 0;
-  _.each(others, function(o) {
-    setOrder(o._id, ++i)
-    if (o._id == afterPlaylistItemId) {
-      setOrder(playlistItemId, ++i)
-    }
-  })
-  
-}
-
 Template.createPlayList.events = {
   'click .do' : function (e) {
-    var playlistName = $('#createPlayListView .name').val();
-    if (playlistName.length == 0 ) return;
-    var playlistNameSimple = playlistName.replace(" ", "").toLowerCase();
-    Meteor.router.navigate("p/" + playlistNameSimple + "/", {trigger: true});
-    var id = Playlists.insert({ 
-      name: playlistName, 
-      name_simple: playlistNameSimple 
-    });
+    var playlist = player.create($('#createPlayListView .name').val());
+    Meteor.router.navigate("p/" + playlist.name_simple + "/", {trigger: true});
   }
 };
-
 
 function attachTypeAhead() {
   Meteor.flush();
@@ -223,34 +182,17 @@ function attachTypeAhead() {
       });
     },
 
-    onselect: function(simpleTrack) {
-      simpleTrack.playlist_id = currentPlaylist()._id;
-      simpleTrack.order = getMaximumOrder(simpleTrack.playlist_id) + 1;
-      PlaylistItems.insert(simpleTrack);
+    onselect: function(track) {
+      player.add(track.name, track.href, track.duration, player.currentPlaylist()._id);
       $('#playlistView .new').val('').focus();
     }
   });
 
 }
-  
-
-function getMaximumOrder(playlistId) {
-  var pli = PlaylistItems.findOne({ playlist_id: playlistId}, { sort: {order: 1}} );
-  if(!pli) return 0;
-  return pli.order;
-}
-
-function currentPlaylist() {
-  return Playlists.findOne({ 
-    name_simple: 
-      Session.get('currentPlayListSimpleName')
-  });
-}
 
 
 Meteor.startup(function() {
   serverTime.startSynchronizing()
-  
 });
 
 

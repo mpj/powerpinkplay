@@ -2,10 +2,27 @@ Player = function(serverTime) {
 	this._serverTime = serverTime;
 };
 
+var getPlaylistItem = function (itemOrId) {
+  if (itemOrId._id)
+  	return itemOrId;
+  return PlaylistItems.findOne(itemOrId);
+}
+
 Player.prototype = {
 
-	getProgress: function(playlistItem) {
-	  var item = playlistItem;
+	create: function(name) {
+		if (name.length == 0 ) return;
+	    var nameSimple = name.replace(" ", "").toLowerCase();
+	    
+	    var playlist = { 
+	      name: name, 
+	      name_simple: nameSimple 
+	    }
+	    return Playlists.findOne(Playlists.insert(playlist));
+	},
+
+	getProgress: function(itemOrId) {
+	  var item = getPlaylistItem(itemOrId);
 
 	  if (item.position == null) return 0;
 
@@ -20,13 +37,14 @@ Player.prototype = {
 	  return progress;
 	},
 
-	isPlaying: function(playlistItem) {
-	  return !!playlistItem.playing_since && 
-	  	     !!this.getProgress(playlistItem);
+	isPlaying: function(itemOrId) {
+	  var item = getPlaylistItem(itemOrId);
+	  return !!item.playing_since && 
+	  	     !!this.getProgress(item);
 	}, 
 
-	pause: function(playlistItem) {
-	  var pli = playlistItem;
+	pause: function(itemOrId) {
+	  var pli = getPlaylistItem(itemOrId);
 	  if (!this.isPlaying(pli)) return;
 
 	  PlaylistItems.update(pli._id, { $set: {
@@ -35,8 +53,8 @@ Player.prototype = {
 	  } });
 	},
 
-	play: function (playlistItem, progress) {
-	  var pli = playlistItem;
+	play: function (itemOrId, progress) {
+	  var pli = getPlaylistItem(itemOrId);
 	  
 	  if (!progress)
 	  	if (pli.position)
@@ -55,6 +73,52 @@ Player.prototype = {
 	    { $set: { playing_since: null, position: null } }, 
 	    { multi: true }
 	  )
-	}
+	},
 
+	getMaximumOrder: function(playlistId) {
+	  var pli = PlaylistItems.findOne({ playlist_id: playlistId}, { sort: {order: 1}} );
+	  if(!pli) return 0;
+	  return pli.order;
+	},
+
+	// TODO: This is presenter stuff
+	currentPlaylist: function() {
+	  return Playlists.findOne({ 
+	    name_simple: 
+	      Session.get('currentPlayListSimpleName')
+	  });
+	},
+
+	move: function(playlistItemId, afterPlaylistItemId) {
+  
+	  // Make this into a server queue
+	  var pl = PlaylistItems.findOne(playlistItemId);
+	  var others = PlaylistItems.find(
+	      { playlist_id: pl.playlist_id, _id: { $ne: playlistItemId } },
+	      { sort: {order: 1}}
+	    ).fetch();
+
+	  var setOrder = function(id, order) {
+	    PlaylistItems.update(id, { $set: { order: order } });
+	  }
+	  
+	  var i = 0;
+	  _.each(others, function(o) {
+	    setOrder(o._id, ++i)
+	    if (o._id == afterPlaylistItemId) {
+	      setOrder(playlistItemId, ++i)
+	    }
+	  })
+	},
+
+	add: function(name, href, duration, playlistId) {
+	  var playlistItem = {}
+      PlaylistItems.insert({
+      	name: name,
+      	href: href,
+      	duration: duration,
+      	playlist_id: playlistId,
+      	order: this.getMaximumOrder(playlistId) + 1
+      });
+	}
 }
