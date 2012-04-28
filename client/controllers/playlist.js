@@ -11,7 +11,6 @@ Template.playlistHeader.playlistName = function () {
 
 Template.playlistItems.items = function () {
   if (!player.currentPlaylist()) return [];
-  Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
   return player.items(player.currentPlaylist());
 }
 
@@ -64,21 +63,48 @@ Template.playlistItem.events = {
 
   'mousedown .moveIcon .clickArea': function(e) {
     e.preventDefault();
-
-    dragManager.clearRectangles();
-    $('.playlistItem').each(function() {
-      var id = getDataId(this),
-          left = $(this).offset().left,
-          top = $(this).offset().top,
-          width = $(this).width(),
-          height = $(this).height(),
-          rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
-      dragManager.addRectangle( id, rectangle );
-    })
     dragManager.start(e.clientX, e.clientY, getDataId(e.target))
   }
 }
 
+var onItemMovedOrAdded = function(item) {
+  Meteor.flush();
+  $("#"+item._id).each(function() {
+    var id = getDataId(this),
+        left = $(this).offset().left,
+        top = $(this).offset().top,
+        width = $(this).width(),
+        height = $(this).height(),
+        rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
+    dragManager.setRectangle( id, rectangle );
+  })
+}
+
+var _handle = null;
+Meteor.autosubscribe(function() {
+  
+  // Stop the old one
+  if (_handle) _handle.stop();
+  if (!player.currentPlaylist()) return;
+  var selector = { playlist_id: player.currentPlaylist()._id };
+  var opts = { sort: { order: 1 } };
+  _handle = PlaylistItems.find(selector, opts).observe({
+    added: function(item) { 
+      setTimeout(function() {onItemMovedOrAdded(item) }, 1)
+      Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY! 
+    },
+    moved: function(item) { 
+      setTimeout(function() {onItemMovedOrAdded(item) }, 1) 
+      Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY! 
+    },
+    removed: function(item) {
+      dragManager.setRectangle(item._id, null);
+      Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY! 
+    }
+  })
+})
+
+  
 dragManager.drop = function(dragToken, dropToken) {
   player.move(dragToken, dropToken);
 }
@@ -102,8 +128,6 @@ Template.playlistItem.offsetY = function() {
 Template.playlistItem.placeHolderClassBelow = function() {
   return this._id == dragManager.hoveredToken() ? 'placeholder' : 'hidden';
 }
-
-
 
 // Retrieves the database id for a PlaylistItem HTML element 
 // or one of it's children.
