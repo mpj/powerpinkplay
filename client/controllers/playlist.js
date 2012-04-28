@@ -28,39 +28,39 @@ Template.playlistItem.needlePosition = function() {
     }, 250);
   }
 
-  return Math.floor($('.playlistItem .container').width() * progress);
+  var scrubberWidth = $('.playlistItem .container').width();
+  return Math.floor(scrubberWidth * progress);
 }
 
 Template.playlistItem.events = {
-  'click .playlistItem .container .clickArea': function(e) {
-  
+  'click .container .clickArea': function(e) {
     e.preventDefault();
 
     var $container = $(e.target).parents('.container'),
         offsetLeft = $container.offset().left,
         relativeX = e.clientX - offsetLeft,
         progress = relativeX / $container.width(),
-        id = $container.parents('.playlistItem').attr("id");
+        id = getId(e.target);
     
     player.play(id, progress);
   },
 
-  'click .playlistItem .playPauseIcon .clickArea': function(e) {
+  'click .playPauseIcon .clickArea': function(e) {
     e.preventDefault();
-    var id = $(e.target).parents('.playlistItem').attr("id");
+
+    var id = getId(e.target);
     if (player.isPlaying(id))
       player.pause(id);
     else
       player.play(id);
   },
 
-  'mousedown .playlistItem .moveIcon .clickArea': function(e) {
+  'mousedown .moveIcon .clickArea': function(e) {
     e.preventDefault();
 
     Session.set('dragOriginX', e.clientX);
     Session.set('dragOriginY', e.clientY);
-    var id = $(e.target).parents('.playlistItem').attr('id');
-    Session.set('draggedItemId', id);
+    Session.set('draggedItemId', getId(e.target));
 
   }
 }
@@ -117,13 +117,13 @@ function hoveredItemId() {
   return hoveredId;
 }
 
+function getId(element) {
+  return $(element).parents('.playlistItem').attr('id');
+}
+
 function getDelta(v1, v2) {
   if (v1 == null || v2 == null) return 0;
   return v1-v2;
-}
-
-function getScrubberWidth() {
-  $("")
 }
 
 function attachTypeAhead() {
