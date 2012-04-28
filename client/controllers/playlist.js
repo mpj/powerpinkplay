@@ -16,8 +16,6 @@ Template.playlistItems.items = function () {
 }
 
 
-// PlaylistItem
-// --------------------------------------------------------
 
 Template.playlistItem.playPauseIconClass = function() {
   return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
@@ -40,18 +38,7 @@ Template.playlistItem.needlePosition = function() {
 }
 
 Template.playlistItem.events = {
-  'click .container .clickArea': function(e) {
-    e.preventDefault();
-
-    var $container = $(e.target).parents('.container'),
-        offsetLeft = $container.offset().left,
-        relativeX = e.clientX - offsetLeft,
-        progress = relativeX / $container.width(),
-        id = getDataId(e.target);
-    
-    player.play(id, progress);
-  },
-
+  
   'click .playPauseIcon .clickArea': function(e) {
     e.preventDefault();
 
@@ -62,12 +49,28 @@ Template.playlistItem.events = {
       player.play(id);
   },
 
-  // Start drag
+  'click .container .clickArea': function(e) {
+    e.preventDefault();
+
+    // Find out the relative position the container was
+    // clicked and scrub to the equivalent place in the track.
+    var $container = $(e.target).parents('.container'),
+        offsetLeft = $container.offset().left,
+        relativeX = e.clientX - offsetLeft,
+        progress = relativeX / $container.width(),
+        id = getDataId(e.target);
+    player.play(id, progress);
+
+  },
+
   'mousedown .moveIcon .clickArea': function(e) {
     e.preventDefault();
 
-    // (Re)construct hit areas for 
-    // all playlistitems (needed by dragmanager)
+    // When the user presses down on the moveIcon, 
+    // we want to initiate dragging.
+
+    // First, construct hit area rectangles 
+    // for all playlistitems.
     var hitAreas = {};
     $(".playlistItem").each(function() {
       var id = getDataId(this),
@@ -98,15 +101,14 @@ dragManager.drop = function(dragToken, dropToken) {
   player.move(dragToken, dropToken);
 }
 
-// Forward mouseup event to dragManager
-$(document).mouseup(function() {
+// Forward required mousevents to DragManager instance.
+document.onmouseup(function() {
   dragManager.mouseup();
 })
-
-// Forward mousemove event to dragManager
-$(document).mousemove(function(e) {
+document.onmousemove(function(e) {
   dragManager.mousemove(e.pageX, e.pageY);
 });
+
 
 
 // Retrieves the database id for a PlaylistItem HTML element 
