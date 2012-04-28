@@ -63,37 +63,27 @@ Template.playlistItem.events = {
 
   // Start drag
   'mousedown .moveIcon .clickArea': function(e) {
-
     e.preventDefault();
-    dragManager.start(e.pageX, e.pageY, createPlaylistItemRectangles())
+
+    // (Re)construct hit areas for 
+    // all playlistitems (needed by dragmanager)
+    var hitAreas = {};
+    $(".playlistItem").each(function() {
+      var id = getDataId(this),
+          left = $(this).position().left,
+          top = $(this).position().top,
+          width = $(this).width(),
+          height = $(this).height(),
+          rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
+      hitAreas[id] = rectangle;
+    });
+    dragManager.start(e.pageX, e.pageY, hitAreas)
   }
 }
 
-function createPlaylistItemRectangles() {
-  var rectangles = {};
-  $(".playlistItem").each(function() {
-    var id = getDataId(this),
-        left = $(this).position().left,
-        top = $(this).position().top,
-        width = $(this).width(),
-        height = $(this).height(),
-        rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
-    rectangles[id] = rectangle;
-  })
-  return rectangles;
-}  
-
-dragManager.drop = function(dragToken, dropToken) {
-  player.move(dragToken, dropToken);
+Template.playlistItem.placeHolderClassBelow = function() {
+  return this._id == dragManager.getHoveredToken() ? 'placeholder' : 'hidden';
 }
-
-$(document).mouseup(function(e) {
-  dragManager.mouseup();
-})
-
-$(document).mousemove(function(e) {
-  dragManager.mousemove(e.pageX, e.pageY);
-});
 
 Template.playlistItem.offsetX = function() {
   return dragManager.getDeltaX(this._id);
@@ -103,9 +93,20 @@ Template.playlistItem.offsetY = function() {
   return dragManager.getDeltaY(this._id);
 }
 
-Template.playlistItem.placeHolderClassBelow = function() {
-  return this._id == dragManager.getHoveredToken() ? 'placeholder' : 'hidden';
+dragManager.drop = function(dragToken, dropToken) {
+  player.move(dragToken, dropToken);
 }
+
+// Forward mouseup event to dragManager
+$(document).mouseup(function() {
+  dragManager.mouseup();
+})
+
+// Forward mousemove event to dragManager
+$(document).mousemove(function(e) {
+  dragManager.mousemove(e.pageX, e.pageY);
+});
+
 
 // Retrieves the database id for a PlaylistItem HTML element 
 // or one of it's children.
