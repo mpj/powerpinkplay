@@ -1,6 +1,4 @@
-var Playlists = new Meteor.Collection("playlists"),
-    PlaylistItems = new Meteor.Collection("playlist_items"),
-    serverTime = new ServerTime,
+var serverTime = new ServerTime,
     player = new Player(serverTime);
 
 Meteor.methods({

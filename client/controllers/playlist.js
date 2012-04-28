@@ -1,44 +1,15 @@
-var Playlists = new Meteor.Collection("playlists"),
-    PlaylistItems = new Meteor.Collection("playlist_items"),
-    serverTime = new ServerTime(),
-    player = new Player(serverTime),
-    SCRUBBER_WIDTH = 500;
-
-var ClientRouter = Backbone.Router.extend({
-    routes: {
-        "p/:simple_name/": "getPlayListBySimpleName"
-    },
-
-    getPlayListBySimpleName: function( simpleName ) {
-      Session.set("currentPlayListSimpleName", simpleName); 
-    }
-});
-
-
-Meteor.router = new ClientRouter;
-Backbone.history.start({pushState: true});
-
-
-Template.createPlayList.viewClass = function () {
-  return player.currentPlaylist() ? 'hidden' : '';
+Template.playlistHeader.playlistName = function () {
+  return !!player.currentPlaylist() ? player.currentPlaylist().name : '';
 }
 
 Template.playlist.viewClass = function () {
   return player.currentPlaylist() ? '' : 'hidden';
 }
 
-
 Template.playlistItems.items = function () {
-
   if (!player.currentPlaylist()) return [];
   Meteor.setTimeout(attachTypeAhead, 1); // FIXME: UGLY!
-  var opts = { sort: { order: 1 }};
-  return PlaylistItems.find({ playlist_id: player.currentPlaylist()._id }, opts).fetch()
-}
-
-
-Template.playlistHeader.playlistName = function () {
-  return !!player.currentPlaylist() ? player.currentPlaylist().name : '';
+  return player.items(player.currentPlaylist());
 }
 
 Template.playlistItem.playPauseIconClass = function() {
@@ -57,9 +28,8 @@ Template.playlistItem.needlePosition = function() {
     }, 250);
   }
 
-  return Math.floor(SCRUBBER_WIDTH * progress);
+  return Math.floor($('.playlistItem .container').width() * progress);
 }
-
 
 Template.playlistItem.events = {
   'click .playlistItem .container .clickArea': function(e) {
@@ -69,7 +39,7 @@ Template.playlistItem.events = {
     var $container = $(e.target).parents('.container'),
         offsetLeft = $container.offset().left,
         relativeX = e.clientX - offsetLeft,
-        progress = relativeX / SCRUBBER_WIDTH,
+        progress = relativeX / $container.width(),
         id = $container.parents('.playlistItem').attr("id");
     
     player.play(id, progress);
@@ -152,12 +122,9 @@ function getDelta(v1, v2) {
   return v1-v2;
 }
 
-Template.createPlayList.events = {
-  'click .do' : function (e) {
-    var playlist = player.create($('#createPlayListView .name').val());
-    Meteor.router.navigate("p/" + playlist.name_simple + "/", {trigger: true});
-  }
-};
+function getScrubberWidth() {
+  $("")
+}
 
 function attachTypeAhead() {
   Meteor.flush();
@@ -189,10 +156,3 @@ function attachTypeAhead() {
   });
 
 }
-
-
-Meteor.startup(function() {
-  serverTime.startSynchronizing()
-});
-
-

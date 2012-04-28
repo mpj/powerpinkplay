@@ -1,20 +1,3 @@
-<head>
-  <title>collabplay</title>
-</head>
-
-<body>
-  {{> createPlayList}}
-  {{> playlist }}
-</body>
-
-<template name="createPlayList">
-  <div id="createPlayListView" class="{{viewClass}}">
-    <h1>Create a playlist</h1>
-    <input class="name" id="createPlayListName" type="text" />
-    <input class="do" type="button" value="Create" />
-  </div>  
-</template>
-
 <template name="playlist">
   <div id="playlistView" class="{{viewClass}}">
     {{> playlistHeader}}
@@ -58,4 +41,3 @@
   </div>
   <div class="{{placeHolderClassBelow}}">XXXXXX</div>
 </template>
-
