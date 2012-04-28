@@ -39,6 +39,7 @@ Template.playlistItems.items = function () {
 
 
 Template.playlistHeader.playlistName = function () {
+
   return !!currentPlaylist() ? currentPlaylist().name : '';
 }
 
@@ -93,57 +94,97 @@ Template.playlistItems.events = {
   'mousedown .playlistItem .moveIcon .clickArea': function(e) {
     e.preventDefault();
 
-    
-    var $pli = $(e.currentTarget).parents('.playlistItem');
-    var startY = e.clientY,
-        startX = e.clientX,
-        originalX = $pli.offset().left,
-        originalY = $pli.offset().top,
-        hovering  = null;
+    Session.set('dragOriginX', e.clientX);
+    Session.set('dragOriginY', e.clientY);
+    var id = $(e.target).parents('.playlistItem').attr('id');
+    Session.set('draggedItemId', id);
 
-    // TODO: Instead of hover, make use of
-    // document.elementFromPoint
-    $('.playlistItem').not("#"+$pli.attr('id')).hover(
-      function() {
-        $(this).after('<div class="placeholder">adsdsd</div>');
-        hovering = this;
-      },  
-      function() {
-        $('.placeholder').remove();
-      }
-    );
-
-    $(document).mousemove(function(e) {
-      var deltaY = e.clientY - startY;
-      var deltaX = e.clientX - startX;
-      $pli.offset({ top: originalY+deltaY, left: originalX+deltaX});
-
-    });
-
-    $(document).mouseup(function(e) {
-      if (hovering) {
-        insertAfter($pli.attr('id'), hovering.id);
-        hovering = null;
-      }
-
-      $(document).unbind('mousemove');
-      $('.playlistItem').unbind('hover')
-      $('.placeholder').remove();
-      $pli.offset({ top: originalY, left: originalX})
-    })
   }
 }
 
-function insertAfter(playlistItemId, afterPlaylistItemId) {
-  // TODO: assign order when playlistitems are created
-  console.log("insertAfter", playlistItemId, afterPlaylistItemId)
-  var target = PlaylistItems.findOne(afterPlaylistItemId);
-  PlaylistItems.update(playlistItemId, { $set: {
-    order: target.order + 0.01//0.000000000000000001
-  } });
+$(document).mouseup(function(e) {
+  var afterId = hoveredItemId();
+  if (afterId)
+    insertAfter(Session.get('draggedItemId'), afterId);
+
+  Session.set('dragOriginX', null);
+  Session.set('dragOriginY', null);
+  Session.set('draggedItemId', null);
+})
+
+$(document).mousemove(function(e) {
+  Session.set('mouseX', e.clientX);
+  Session.set('mouseY', e.clientY);
+});
+
+
+Template.playlistItems.placeHolderClassBelow = function() {
+  return (this._id == hoveredItemId())  ? 'placeholder' : 'hidden';
 }
 
+Template.playlistItems.offsetX = function() {
+  if (this._id != Session.get('draggedItemId')) return 0;
+  return getDelta(Session.get('mouseX'), Session.get('dragOriginX'))
+}
 
+Template.playlistItems.offsetY = function() {
+  if (this._id != Session.get('draggedItemId')) return 0;
+  return getDelta(Session.get('mouseY'), Session.get('dragOriginY'))
+}
+
+function hoveredItemId() {
+  if (!Session.get('dragOriginX')) return null;
+  var mx = Session.get('mouseX'),
+      my = Session.get('mouseY'),
+      hoveredId = null;
+
+  // TODO: Needs some kind of cache.
+  $('.playlistItem').not('#'+Session.get('draggedItemId')).each(function() {
+    var offset = $(this).offset(),
+        x1 = offset.left,
+        y1 = offset.top,
+        x2 = offset.left + $(this).width(),
+        y2 = offset.top  + $(this).height(),
+        isInsideBox = !(mx < x1 || x2 < mx || my < y1 || y2 < my);
+    if(isInsideBox) {
+      hoveredId = this.id;
+      return;
+    }
+  })
+  if (hoveredId)
+    console.log("Hovering", PlaylistItems.findOne(hoveredId).name)
+  return hoveredId;
+}
+
+function getDelta(v1, v2) {
+  if (v1 == null || v2 == null) return 0;
+  return v1-v2;
+}
+
+function insertAfter(playlistItemId, afterPlaylistItemId) {
+  
+
+  // Make this into a server queue
+  var pl = PlaylistItems.findOne(playlistItemId);
+  console.log(pl)
+  var others = PlaylistItems.find(
+      { playlist_id: pl.playlist_id, _id: { $ne: playlistItemId } },
+      { sort: {order: 1}}
+    ).fetch();
+
+  var setOrder = function(id, order) {
+    PlaylistItems.update(id, { $set: { order: order } });
+  }
+  
+  var i = 0;
+  _.each(others, function(o) {
+    setOrder(o._id, ++i)
+    if (o._id == afterPlaylistItemId) {
+      setOrder(playlistItemId, ++i)
+    }
+  })
+  
+}
 
 Template.createPlayList.events = {
   'click .do' : function (e) {
@@ -194,7 +235,7 @@ function attachTypeAhead() {
   
 
 function getMaximumOrder(playlistId) {
-  var pli = PlaylistItems.findOne({ playlist_id: playlistId}, { sort: {order: -1}} );
+  var pli = PlaylistItems.findOne({ playlist_id: playlistId}, { sort: {order: 1}} );
   if(!pli) return 0;
   return pli.order;
 }
