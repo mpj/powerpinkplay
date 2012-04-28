@@ -63,7 +63,7 @@ Template.playlistItem.events = {
 
   'mousedown .moveIcon .clickArea': function(e) {
     e.preventDefault();
-    dragManager.start(e.clientX, e.clientY, getDataId(e.target))
+    dragManager.start(e.pageX, e.pageY, getDataId(e.target))
   }
 }
 
@@ -71,8 +71,8 @@ var onItemMovedOrAdded = function(item) {
   Meteor.flush();
   $("#"+item._id).each(function() {
     var id = getDataId(this),
-        left = $(this).offset().left,
-        top = $(this).offset().top,
+        left = $(this).position().left,
+        top = $(this).position().top,
         width = $(this).width(),
         height = $(this).height(),
         rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
@@ -114,7 +114,7 @@ $(document).mouseup(function(e) {
 })
 
 $(document).mousemove(function(e) {
-  dragManager.mousemove(e.clientX, e.clientY);
+  dragManager.mousemove(e.pageX, e.pageY);
 });
 
 Template.playlistItem.offsetX = function() {
