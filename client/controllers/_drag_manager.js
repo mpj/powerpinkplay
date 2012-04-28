@@ -30,6 +30,9 @@ DragManager.prototype =  {
     this._dragged = null;
 
   },
+  clearRectangles: function() {
+    this._rectangles = {};
+  },
   setRectangle: function(token, rectangle) {
     if ((rectangle == null) || (rectangle.x1 && rectangle.x2 && rectangle.y1 && rectangle.y2))
       this._rectangles[token] = rectangle;

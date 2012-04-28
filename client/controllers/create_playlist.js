@@ -1,5 +1,5 @@
 Template.createPlaylist.viewClass = function () {
-  return player.currentPlaylist() ? 'hidden' : '';
+  return currentPlaylist() ? 'hidden' : '';
 }
 
 Template.createPlaylist.events = {
