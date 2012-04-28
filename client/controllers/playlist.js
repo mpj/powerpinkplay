@@ -1,4 +1,4 @@
-
+var dragManager = new DragManager;
 
 // This view should only be visible if we have navigated to a playlist.
 Template.playlist.viewClass = function () {
@@ -64,70 +64,46 @@ Template.playlistItem.events = {
 
   'mousedown .moveIcon .clickArea': function(e) {
     e.preventDefault();
-    Session.set('dragItemId', getDataId(e.target));
-    Session.set('dragOriginX', e.clientX);
-    Session.set('dragOriginY', e.clientY);
+
+    dragManager.clearRectangles();
+    $('.playlistItem').each(function() {
+      var id = getDataId(this),
+          left = $(this).offset().left,
+          top = $(this).offset().top,
+          width = $(this).width(),
+          height = $(this).height(),
+          rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
+      dragManager.addRectangle( id, rectangle );
+    })
+    dragManager.start(e.clientX, e.clientY, getDataId(e.target))
   }
 }
 
-$(document).mouseup(function(e) {
-  var afterId = getHoveredItemId();
-  if (afterId)
-    player.move(Session.get('dragItemId'), afterId);
+dragManager.drop = function(dragToken, dropToken) {
+  player.move(dragToken, dropToken);
+}
 
-  Session.set('dragItemId', null);
-  Session.set('dragOriginX', null);
-  Session.set('dragOriginY', null);
+$(document).mouseup(function(e) {
+  dragManager.mouseup();
 })
 
 $(document).mousemove(function(e) {
-  Session.set('mouseX', e.clientX);
-  Session.set('mouseY', e.clientY);
+  dragManager.mousemove(e.clientX, e.clientY);
 });
 
-
 Template.playlistItem.offsetX = function() {
-  return calculateOffset(this._id, false)
+  return dragManager.getDeltaX(this._id);
 }
 
 Template.playlistItem.offsetY = function() {
-  return calculateOffset(this._id, true)
-}
-
-function calculateOffset(itemId, vertical) {
-  if (itemId != Session.get('dragItemId')) return 0;
-  var xOrY = vertical ? "Y" : "X";
-  var delta = Session.get('mouse' + xOrY) - Session.get('dragOrigin' + xOrY);
-  return delta;
+  return dragManager.getDeltaY(this._id);
 }
 
 Template.playlistItem.placeHolderClassBelow = function() {
-  return this._id == getHoveredItemId() ? 'placeholder' : 'hidden';
+  return this._id == dragManager.hoveredToken() ? 'placeholder' : 'hidden';
 }
 
-function getHoveredItemId() {
-  if (!Session.get('dragOriginX')) return null;
-  var mx = Session.get('mouseX'),
-      my = Session.get('mouseY'),
-      hoveredId = null;
 
-  var $staticItems = $('.playlistItem').not('#'+Session.get('dragItemId'));
-
-  $staticItems.each(function() {
-    var offset = $(this).offset(),
-        x1 = offset.left,
-        y1 = offset.top,
-        x2 = offset.left + $(this).width(),
-        y2 = offset.top  + $(this).height(),
-        isInsideBox = my > y1 && my < y2 && mx > x1 && mx < x2;
-    if(isInsideBox) {
-      hoveredId = this.id;
-      return;
-    }
-  })
-  var end = Number(new Date());
-  return hoveredId;
-}
 
 // Retrieves the database id for a PlaylistItem HTML element 
 // or one of it's children.
