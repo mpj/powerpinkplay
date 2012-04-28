@@ -41,20 +41,12 @@ function checkForSkipping(playlistItemId) {
 }
 
 function findNextSibling(playlistItem) {
-	var pli = playlistItem;
-	// TODO: This can be done cleaner now that we have order.
-	var siblings = PlaylistItems.find({ playlist_id: pli.playlist_id}, { sort: { order: 1 }}).fetch();
-	var lastHasReachedEnd = false;
-	for (var i=0;i<siblings.length;i++) {
-		var s = siblings[i];
-
-		if(lastHasReachedEnd)
-			return s;
-		
-		if (s._id == pli._id)
-			lastHasReachedEnd = true;
+	var selector = { 
+		playlist_id: playlistItem.playlist_id, 
+		order: { $gt: playlistItem.order } 
 	}
-	return null;
+	var options = { sort: { order: 1 } }	
+	return PlaylistItems.findOne(selector, options);
 }
 
 

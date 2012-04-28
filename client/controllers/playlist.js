@@ -15,8 +15,6 @@ Template.playlistItems.items = function () {
   return player.items(currentPlaylist());
 }
 
-
-
 Template.playlistItem.playPauseIconClass = function() {
   return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
 }
@@ -96,20 +94,21 @@ dragManager.drop = function(dragToken, dropToken) {
 }
 
 // Forward required mousevents to DragManager instance.
-document.onmouseup(function() {
-  dragManager.mouseup();
-})
-document.onmousemove(function(e) {
-  dragManager.mousemove(e.pageX, e.pageY);
-});
+$(document)
+  .mouseup(function() {
+    dragManager.mouseup();
+  })
+  .mousemove(function(e) {
+    dragManager.mousemove(e.pageX, e.pageY);
+  });
 
 // Gets the rectangle of a html element,
 // absolutely positioned on the document.
-function getRectangle(this) {
-  var left = $(this).position().left,
-      top = $(this).position().top,
-      width = $(this).width(),
-      height = $(this).height();
+function getRectangle(element) {
+  var left = $(element).position().left,
+      top = $(element).position().top,
+      width = $(element).width(),
+      height = $(element).height();
   return { x1: left, y1: top, x2: left + width, y2: top + height };
 }
 
