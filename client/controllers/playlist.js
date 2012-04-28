@@ -73,13 +73,7 @@ Template.playlistItem.events = {
     // for all playlistitems.
     var hitAreas = {};
     $(".playlistItem").each(function() {
-      var id = getDataId(this),
-          left = $(this).position().left,
-          top = $(this).position().top,
-          width = $(this).width(),
-          height = $(this).height(),
-          rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
-      hitAreas[id] = rectangle;
+      hitAreas[getDataId(this)] = getRectangle(this);
     });
     dragManager.start(e.pageX, e.pageY, hitAreas)
   }
@@ -109,7 +103,15 @@ document.onmousemove(function(e) {
   dragManager.mousemove(e.pageX, e.pageY);
 });
 
-
+// Gets the rectangle of a html element,
+// absolutely positioned on the document.
+function getRectangle(this) {
+  var left = $(this).position().left,
+      top = $(this).position().top,
+      width = $(this).width(),
+      height = $(this).height();
+  return { x1: left, y1: top, x2: left + width, y2: top + height };
+}
 
 // Retrieves the database id for a PlaylistItem HTML element 
 // or one of it's children.
