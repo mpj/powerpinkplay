@@ -61,15 +61,16 @@ Template.playlistItem.events = {
       player.play(id);
   },
 
+  // Start drag
   'mousedown .moveIcon .clickArea': function(e) {
+
     e.preventDefault();
-    updateRectangles();
-    dragManager.start(e.pageX, e.pageY, getDataId(e.target))
+    dragManager.start(e.pageX, e.pageY, createPlaylistItemRectangles())
   }
 }
 
-function updateRectangles() {
-  dragManager.clearRectangles();
+function createPlaylistItemRectangles() {
+  var rectangles = {};
   $(".playlistItem").each(function() {
     var id = getDataId(this),
         left = $(this).position().left,
@@ -77,8 +78,9 @@ function updateRectangles() {
         width = $(this).width(),
         height = $(this).height(),
         rectangle = { x1: left, y1: top, x2: left + width, y2: top + height };
-    dragManager.setRectangle( id, rectangle );
+    rectangles[id] = rectangle;
   })
+  return rectangles;
 }  
 
 dragManager.drop = function(dragToken, dropToken) {
@@ -102,7 +104,7 @@ Template.playlistItem.offsetY = function() {
 }
 
 Template.playlistItem.placeHolderClassBelow = function() {
-  return this._id == dragManager.hoveredToken() ? 'placeholder' : 'hidden';
+  return this._id == dragManager.getHoveredToken() ? 'placeholder' : 'hidden';
 }
 
 // Retrieves the database id for a PlaylistItem HTML element 
