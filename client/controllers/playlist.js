@@ -6,7 +6,6 @@ Template.playlist.viewClass = function () {
 }
 
 Template.addPlaylistItem.typeAheadResults = function() {
-  console.log("dsdsa",Session.get('typeAheadFocus'))
   if (!Session.get('typeAheadFocus')) return [];
   return typeAhead.results();
 }
@@ -19,10 +18,10 @@ Template.addPlaylistItem.class = function() {
 Template.addPlaylistItem.loading = typeAhead.isLoading;
 
 Template.addPlaylistItem.events = {
-  'blur input': function(e) {
+  'focusout input': function(e) {
     Session.set('typeAheadFocus', false);
   },
-  'focus input': function(e) {
+  'focusin input': function(e) {
     Session.set('typeAheadFocus', true);
   },
   'keyup input': function(e) {
