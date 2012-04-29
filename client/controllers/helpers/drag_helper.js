@@ -1,10 +1,10 @@
 
-DragManager = function() {
+DragHelper = function() {
   this._draggedToken = null;
   this._hitAreas = {};
 }
 
-DragManager.prototype =  {
+DragHelper.prototype =  {
 
   start: function(x, y, hitAreas) {
     this._hitAreas = hitAreas;

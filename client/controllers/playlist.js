@@ -1,4 +1,4 @@
-var dragManager = new DragManager;
+var dragHelper = new DragHelper;
 
 // This view should only be visible if we have navigated to a playlist.
 Template.playlist.isVisible = function () {
@@ -53,7 +53,7 @@ Template.playlistItems.items = function () {
 }
 
 Template.playlistItems.isDragging = function() {
-  return dragManager.getIsDragging();
+  return dragHelper.getIsDragging();
 }
 
 Template.playlistItem.playPauseIconClass = function() {
@@ -115,23 +115,23 @@ Template.playlistItem.events = {
       hitAreas[getDataId(this)] = getRectangle(this);
     });
     hitAreas['trash'] = getRectangle($('#trash'));
-    dragManager.start(e.pageX, e.pageY, hitAreas)
+    dragHelper.start(e.pageX, e.pageY, hitAreas)
   }
 }
 
 Template.playlistItem.isPlaceholderVisible = function() {
-  return this._id == dragManager.getHoveredToken();
+  return this._id == dragHelper.getHoveredToken();
 }
 
 Template.playlistItem.offsetX = function() {
-  return dragManager.getDeltaX(this._id);
+  return dragHelper.getDeltaX(this._id);
 }
 
 Template.playlistItem.offsetY = function() {
-  return dragManager.getDeltaY(this._id);
+  return dragHelper.getDeltaY(this._id);
 }
 
-dragManager.drop = function(dragToken, dropToken) {
+dragHelper.drop = function(dragToken, dropToken) {
   console.log(dropToken)
   if (dropToken == "trash")
     player.remove(dragToken);
@@ -143,10 +143,10 @@ dragManager.drop = function(dragToken, dropToken) {
 
 $(document)
   .mouseup(function() {
-    dragManager.mouseup();
+    dragHelper.mouseup();
   })
   .mousemove(function(e) {
-    dragManager.mousemove(e.pageX, e.pageY);
+    dragHelper.mousemove(e.pageX, e.pageY);
   });
 
 // Gets the rectangle of a html element,
