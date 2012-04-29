@@ -1,9 +1,11 @@
 <template name="playlist">
-  <div id="playlist" class="{{class}}">
-    <h1>{{ playlistName }}</h1>
-    {{> playlistItems }}
-    {{> addPlaylistItem }}
-  </div>  
+  {{#if isVisible }}
+    <div id="playlist" class="{{class}}">
+      <h1>{{ playlistName }}</h1>
+      {{> playlistItems }}
+      {{> addPlaylistItem }}
+    </div>  
+  {{/if}}
 </template>
 
 <template name="playlistItems">
@@ -43,8 +45,10 @@
     </span>
 
   </div>
-
-  <div class="{{ placeHolderClassBelow }}" />
+  
+  {{#if isPlaceholderVisible }}
+    <div class="placeholder" />
+  {{/if}}
 
 </template>
 

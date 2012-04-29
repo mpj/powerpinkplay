@@ -1,8 +1,8 @@
 var dragManager = new DragManager;
 
 // This view should only be visible if we have navigated to a playlist.
-Template.playlist.class = function () {
-  return currentPlaylist() ? '' : 'hidden';
+Template.playlist.isVisible = function () {
+  return !!currentPlaylist();
 }
 
 Template.playlist.playlistName = function () {
@@ -119,8 +119,8 @@ Template.playlistItem.events = {
   }
 }
 
-Template.playlistItem.placeHolderClassBelow = function() {
-  return this._id == dragManager.getHoveredToken() ? 'placeholder' : 'hidden';
+Template.playlistItem.isPlaceholderVisible = function() {
+  return this._id == dragManager.getHoveredToken();
 }
 
 Template.playlistItem.offsetX = function() {

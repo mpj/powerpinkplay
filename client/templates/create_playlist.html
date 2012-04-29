@@ -1,10 +1,12 @@
 <template name="createPlaylist">
-  <div id="createPlaylistView" class="{{viewClass}}">
-    <span class="content">
-    	<h1>Give your playlist a name!</h1>
-    	<input class="name" id="createPlayListName" type="text" />
-    	<input class="do btn-primary" type="button" value="Create" />
-   	</span>
-    <div class="background" />
-  </div>  
+  {{#if isVisible}}
+    <div id="createPlaylistView" class="{{viewClass}}">
+      <span class="content">
+        <h1>Give your playlist a name!</h1>
+        <input class="name" id="createPlayListName" type="text" />
+        <input class="do btn-primary" type="button" value="Create" />
+      </span>
+      <div class="background" />
+    </div>  
+  {{/if}}
 </template>

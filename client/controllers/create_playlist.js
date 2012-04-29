@@ -1,5 +1,5 @@
-Template.createPlaylist.viewClass = function () {
-  return currentPlaylist() ? 'hidden' : '';
+Template.createPlaylist.isVisible = function () {
+  return !currentPlaylist();
 }
 
 function createPlaylist() {
