@@ -2,12 +2,16 @@
   <div id="playlistView" class="{{viewClass}}">
     {{> playlistHeader}}
     {{> playlistItems}}
-    {{> addPlaylistItem}}
+    <div id="addPlaylistItem">
+      {{> addPlaylistItem}}
+    </div>
   </div>  
 </template>
 
 <template name="addPlaylistItem">
-  {{#if loading}}LOADING{{/if}}
+  <span class="loadingImage" {{#unless loading}}style="visibility:hidden"{{/unless}}>
+    <img src="/img/loading.gif" />
+  </span>
   <input id="playlistViewNew" class="new" />
   <div class="typeAheads">
     {{#each typeAheadResults}}

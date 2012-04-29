@@ -6,6 +6,7 @@ Template.playlist.viewClass = function () {
 }
 
 Template.addPlaylistItem.typeAheadResults = function() {
+  console.log("dsdsa",Session.get('typeAheadFocus'))
   if (!Session.get('typeAheadFocus')) return [];
   return typeAhead.results();
 }

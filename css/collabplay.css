@@ -14,7 +14,7 @@ body {
 }
 
 #playlistView .new { 
-	width: 490px; /* -10 to compensate for border and padding */
+	width: 460px; 
 	font-size: 18px;
 }
 
@@ -22,6 +22,8 @@ body {
 	text-align: left;
 	font-size: 16px;
 	line-height: 22px;
+	position: relative;
+	left: 25px;
 }
 
 #playlistView .typeAhead.selected {
@@ -56,6 +58,23 @@ body {
 	font-size: 20px;
 	line-height: 40px;
 	visibility: hidden;
+	z-index: 99999;
+}
+
+#addPlaylistItem  {
+
+}
+#addPlaylistItem .loadingImage {
+	display: inline-block;
+	position: relative;
+	float: left;
+	width: 19px;
+	height: 30px;
+}
+#addPlaylistItem .loadingImage img { 
+	position: absolute;
+	left: -3px;
+	top: 11px;
 }
 
 #playlistView h1 { margin-bottom: 20px;}
