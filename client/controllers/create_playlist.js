@@ -4,7 +4,7 @@ Template.createPlaylist.viewClass = function () {
 
 Template.createPlaylist.events = {
   'click .do' : function (e) {
-    var playlist = player.create($('#createPlayListView .name').val());
+    var playlist = player.create($('#createPlaylistView .name').val());
     Meteor.router.navigate("p/" + playlist.name_simple + "/", {trigger: true});
   }
 };

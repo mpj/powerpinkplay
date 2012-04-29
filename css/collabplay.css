@@ -18,6 +18,16 @@ body {
 	font-size: 18px;
 }
 
+#playlistView .typeAhead {
+	text-align: left;
+	font-size: 16px;
+	line-height: 22px;
+}
+
+#playlistView .typeAhead.selected {
+	background-color: orange;
+}
+
 #playlistView .play {
 	padding: 10px;
 	font-size: 14px;

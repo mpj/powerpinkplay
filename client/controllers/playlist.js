@@ -1,8 +1,40 @@
 var dragManager = new DragManager;
 
+var KEY_CODE_ARROW_DOWN = 40;
+var KEY_CODE_ARROW_UP = 38;
 // This view should only be visible if we have navigated to a playlist.
 Template.playlist.viewClass = function () {
   return currentPlaylist() ? '' : 'hidden';
+}
+
+Template.addPlaylistItem.typeAheadResults = function() {
+  if (!Session.get('typeAheadFocus')) return [];
+  return typeAhead.results();
+}
+
+Template.addPlaylistItem.class = function() {
+  var isSelected = typeAhead.isSelected(this);
+  return isSelected ? 'typeAhead selected' : 'typeAhead';
+}
+
+Template.addPlaylistItem.loading = typeAhead.isLoading;
+
+Template.addPlaylistItem.events = {
+  'blur input': function(e) {
+    Session.set('typeAheadFocus', false);
+  },
+  'focus input': function(e) {
+    Session.set('typeAheadFocus', true);
+  },
+  'keyup input': function(e) {
+    if (e.keyCode == KEY_CODE_ARROW_DOWN)
+      typeAhead.selectNext();
+    else if(e.keyCode == KEY_CODE_ARROW_UP)
+      typeAhead.selectPrevious();
+    else
+      typeAhead.query(e.target.value);
+  },
+  
 }
 
 Template.playlistHeader.playlistName = function () {
@@ -94,6 +126,7 @@ dragManager.drop = function(dragToken, dropToken) {
 }
 
 // Forward required mousevents to DragManager instance.
+
 $(document)
   .mouseup(function() {
     dragManager.mouseup();
@@ -121,7 +154,7 @@ function getDataId(element) {
 }
 
 function attachTypeAhead() {
-  Meteor.flush();
+  /*Meteor.flush();
   $('#playlistView .new').typeahead({
 
     property: 'name',
@@ -136,5 +169,5 @@ function attachTypeAhead() {
       player.add(track.name, track.href, track.duration, currentPlaylist()._id);
       $('#playlistView .new').val('').focus();
     }
-  });
+  });*/
 }

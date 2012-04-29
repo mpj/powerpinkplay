@@ -2,8 +2,18 @@
   <div id="playlistView" class="{{viewClass}}">
     {{> playlistHeader}}
     {{> playlistItems}}
-    <input class="new" />
+    {{> addPlaylistItem}}
   </div>  
+</template>
+
+<template name="addPlaylistItem">
+  {{#if loading}}LOADING{{/if}}
+  <input id="playlistViewNew" class="new" />
+  <div class="typeAheads">
+    {{#each typeAheadResults}}
+      <div class="{{class}}">{{label}}</div>
+    {{/each}}
+  </div>
 </template>
 
 <template name="playlistHeader">

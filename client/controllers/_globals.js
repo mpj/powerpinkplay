@@ -1,6 +1,7 @@
 serverTime = new ServerTime();
 player = new Player(serverTime);
-spotifySearch = new SpotifySearch
+spotifyTrackSearch = new SpotifyTrackSearch;
+typeAhead = new TypeAheadHelper(spotifyTrackSearch);
 
 function currentPlaylist() {
   return Playlists.findOne({ 
