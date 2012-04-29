@@ -208,7 +208,6 @@ h1#logo {
 	line-height: 100%;
 	display: block;
 	white-space: nowrap; 
-
 }
 .playlistItem .container .scrubber {
 	position: absolute;
@@ -235,6 +234,15 @@ h1#logo {
 	position: absolute;
 	left: 10px;
 	top: 7px;
+}
+.placeholder {
+	display: block;
+	width: 500px;
+	margin-left: 25px;
+	background-color: #000000;
+	opacity: 0.4;
+	height: 30px;
+	margin-bottom: 15px;
 }
 
 .typeahead.dropdown-menu {
