@@ -4,6 +4,8 @@
 html {
 	background-image: url(/img/enourmous_bg.jpg);
 	background-color: transparent;
+	background-position: left bottom;
+	background-attachment:fixed;
 }
 body {
 	text-align: center;
@@ -11,7 +13,8 @@ body {
 	background-color: transparent;
 }
 h1 { font-family: 'Just Me Again Down Here', cursive; 
-	 font-size: 40px; }
+	 font-size: 50px;
+	 color: white; }
 
 #createPlaylistView {
 	position: absolute;
@@ -66,18 +69,10 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	font-size: 18px;
 }
 
-#playlistView .typeAhead {
-	text-align: left;
-	font-size: 16px;
-	line-height: 22px;
-	position: relative;
-	left: 25px;
-}
 
 #playlistView .typeAhead.selected {
 	background-color: orange;
 }
-
 
 #playlistView .typeAhead {
 	text-align: left;
@@ -87,6 +82,9 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	white-space: nowrap;
 	overflow: hidden;
 }
+
+
+
 
 
 #playlistView .play {
@@ -116,13 +114,35 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	display: inline-block;
 	position: relative;
 	float: left;
-	width: 19px;
+	width: 25px;
 	height: 30px;
 }
-#addPlaylistItem .loadingImage img { 
+
+#addPlaylistItem .loadingImage .spinner {
 	position: absolute;
-	left: -3px;
-	top: 11px;
+	left: -6px;
+	top: 2px;
+	background-color: rgba(0,0,0,0);
+	border:5px solid rgba(255,255,255,0.7);
+	opacity:.7;
+	border-right:5px solid rgba(0,0,0,0);
+	border-left:5px solid rgba(0,0,0,0);
+	border-radius:25px;
+	width:15px;
+	height:15px;
+	margin:0 auto;
+	-moz-animation:spinPulse 0.7s infinite ease-in-out;
+	-webkit-animation:spinPulse 0.7s infinite linear;
+}
+@-moz-keyframes spinPulse {
+	0% { -moz-transform:rotate(160deg); opacity:0; }
+	25% { -moz-transform:rotate(145deg); opacity:1; }
+	100% { -moz-transform:rotate(-320deg); opacity:0; }
+}
+@-webkit-keyframes spinPulse {
+	0% { -webkit-transform:rotate(160deg); opacity:0; }
+	25% { -webkit-transform:rotate(145deg); opacity:1;}
+	100% { -webkit-transform:rotate(-320deg); opacity:0; }
 }
 
 #playlistView h1 { margin-bottom: 20px;}
@@ -212,3 +232,5 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	height: 100%;
 	z-index: 999;
 }
+
+

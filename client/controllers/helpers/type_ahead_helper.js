@@ -7,12 +7,13 @@ TypeAheadHelper.prototype = {
   
   query: function(query) {
     
+    Session.set('typeAheadIsLoading', true);
+
     // Wrap within a clearing timeout
     // to prevent API spamming
     clearTimeout(this._timeoutHandle);
     var that = this, sess = Session;
     this._timeoutHandle = Meteor.setTimeout(function() {
-      sess.set('typeAheadIsLoading', true);
       that._searcher.search(query, function(error, results) {
         sess.set('typeAheadIsLoading', false);
         if(error)
