@@ -25,8 +25,7 @@ TypeAheadHelper.prototype = {
   isSelected: function(item) {
     var results = Session.get('typeAheadResults');
     if (!results) return false;
-    var selected = results[Session.get('typeAheadSelectedIndex')];
-    return item == selected;
+    return item == this.getSelected();
   },
 
   selectNext: function() {
@@ -37,8 +36,17 @@ TypeAheadHelper.prototype = {
     this._moveIndex(-1);
   },
 
+  getSelected: function() {
+    var results = Session.get('typeAheadResults');
+    return results[Session.get('typeAheadSelectedIndex')];
+  },
+
   results: function() {
     return Session.get('typeAheadResults');
+  },
+
+  clear: function() {
+    return Session.set('typeAheadResults', null);
   },
   
   _moveIndex: function(delta) {

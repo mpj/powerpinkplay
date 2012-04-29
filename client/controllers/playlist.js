@@ -1,7 +1,9 @@
 var dragManager = new DragManager;
 
-var KEY_CODE_ARROW_DOWN = 40;
-var KEY_CODE_ARROW_UP = 38;
+var KEY_CODE_ARROW_DOWN = 40,
+    KEY_CODE_ARROW_UP   = 38,
+    KEY_CODE_ENTER      = 13;
+
 // This view should only be visible if we have navigated to a playlist.
 Template.playlist.viewClass = function () {
   return currentPlaylist() ? '' : 'hidden';
@@ -27,7 +29,13 @@ Template.addPlaylistItem.events = {
     Session.set('typeAheadFocus', true);
   },
   'keyup input': function(e) {
-    if (e.keyCode == KEY_CODE_ARROW_DOWN)
+    if (e.keyCode == KEY_CODE_ENTER) {
+      var selected = typeAhead.getSelected();
+      var playlistId = currentPlaylist()._id;
+      player.add(selected.label, selected.data.href, selected.data.duration, playlistId);
+      $(e.target).val('').focus();
+      typeAhead.clear();
+    } else if (e.keyCode == KEY_CODE_ARROW_DOWN)
       typeAhead.selectNext();
     else if(e.keyCode == KEY_CODE_ARROW_UP)
       typeAhead.selectPrevious();
