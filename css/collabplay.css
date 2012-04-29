@@ -4,7 +4,7 @@
 html {
 	background-image: url(/img/enourmous_bg.jpg);
 	background-color: transparent;
-	background-position: left bottom;
+	background-position: bottom left;
 	background-attachment:fixed;
 }
 body {
@@ -15,7 +15,15 @@ body {
 h1 { font-family: 'Just Me Again Down Here', cursive; 
 	 font-size: 50px;
 	 color: white; }
-
+h1#logo {
+	position: absolute;
+	top: 10px;
+	left: 0px;
+	font-size: 130px;
+	opacity: 0.4;
+	-moz-opacity: 0.4;
+	filter:alpha(opacity=5);
+}
 #createPlaylistView {
 	position: absolute;
 	top: 200px;
@@ -25,6 +33,7 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	width: 400px;
 	height: 120px;
 }
+
 #createPlaylistView .content {
 	position: absolute;
 	z-index: 10;
@@ -129,9 +138,6 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	opacity: 1;
 }
 
-
-
-
 #playlistView .play {
 	padding: 10px;
 	font-size: 14px;
@@ -184,7 +190,7 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	width: 500px;
 	height: 100%;
 	left: 25px;
-	background-color: red;
+	box-shadow: 2px 2px 3px rgba(0,0,0,0.6);
 }
 
 .playlistItem .container .name {
@@ -205,14 +211,15 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	position: absolute;
 	height: 30px;
 	top: 0;
-	background-color: #00AD0E;
+	background-color: #FF0066;
 	z-index: 2;
 }
 .playlistItem .container .background {
-	background-color: #B7C7B8;
+	background-color: #000000;
 	width: 500px;
 	height: 30px;
 	position: absolute;
+	opacity: 0.65;
 	z-index: 1;
 }
 .playlistItem .moveIcon {

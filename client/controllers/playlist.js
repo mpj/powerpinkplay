@@ -55,7 +55,7 @@ Template.playlistItems.isDragging = function() {
 }
 
 Template.playlistItem.playPauseIconClass = function() {
-  return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
+  return player.isPlaying(this) ? 'icon-pause icon-white' : 'icon-play icon-white';
 }
 
 Template.playlistItem.needlePosition = function() {
