@@ -51,7 +51,6 @@ Template.playlistHeader.playlistName = function () {
 
 Template.playlistItems.items = function () {
   if (!currentPlaylist()) return [];
-  setTimeout(attachTypeAhead, 100) // FIXME: UGLY!!!
   return player.items(currentPlaylist());
 }
 
@@ -159,23 +158,4 @@ function getDataId(element) {
   var $parents = $(element).parents('.playlistItem');
   if(!$parents.length) return element.id;
   return $parents.attr('id');
-}
-
-function attachTypeAhead() {
-  /*Meteor.flush();
-  $('#playlistView .new').typeahead({
-
-    property: 'name',
-    
-    source: function (typeahead, query) {
-      spotifySearch.track(query, function(tracks) {
-        return typeahead.process(tracks);
-      });
-    },
-
-    onselect: function(track) {
-      player.add(track.name, track.href, track.duration, currentPlaylist()._id);
-      $('#playlistView .new').val('').focus();
-    }
-  });*/
 }

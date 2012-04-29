@@ -36,7 +36,6 @@ function checkForSkipping(playlistItemId) {
     if(isPastEnd) {
 		var nextSibling = findNextSibling(pli);
 		if (nextSibling) player.play(nextSibling);
-		
     }
 }
 
