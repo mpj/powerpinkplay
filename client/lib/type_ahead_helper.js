@@ -48,7 +48,9 @@ TypeAheadHelper.prototype = {
   },
 
   getSelected: function() {
+    if(Session.get('typeAheadSelectedIndex') < 0) return null;
     var results = Session.get('typeAheadResults');
+    if(!results) return null;
     return results[Session.get('typeAheadSelectedIndex')];
   },
 

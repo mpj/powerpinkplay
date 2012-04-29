@@ -1,7 +1,7 @@
 <template name="playlist">
   {{#if isVisible }}
     <div id="playlist" class="{{class}}">
-      <h1>{{ playlistName }}</h1>
+      <h1>{{ headerText }}</h1>
       {{> playlistItems }}
       {{> addPlaylistItem }}
     </div>  
@@ -63,7 +63,7 @@
     <input id="playlistViewNew" />
     <div class="typeAheads">
       {{#each typeAheadResults }}
-        <div class="{{class}}">{{ label }}</div>
+        <div class="option {{#if isSelected}}selected{{/if}}">{{ label }}</div>
       {{/each}}
     </div>
   </div>
