@@ -28,6 +28,17 @@ body {
 	background-color: orange;
 }
 
+
+#playlistView .typeAhead {
+	text-align: left;
+	font-size: 16px;
+	line-height: 22px;
+	width: 500px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+
 #playlistView .play {
 	padding: 10px;
 	font-size: 14px;
@@ -87,6 +98,12 @@ body {
 	color: white;
 	top: 5px;
 	left: 10px;
+	overflow: hidden;
+	width: 485px;
+	height: 100%;
+	line-height: 100%;
+	display: block;
+	white-space: nowrap; 
 
 }
 .playlistItem .container .scrubber {
