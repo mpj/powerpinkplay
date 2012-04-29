@@ -54,6 +54,10 @@ Template.playlistItems.items = function () {
   return player.items(currentPlaylist());
 }
 
+Template.playlistItems.isDragging = function() {
+  return dragManager.getIsDragging();
+}
+
 Template.playlistItem.playPauseIconClass = function() {
   return player.isPlaying(this) ? 'icon-pause' : 'icon-play';
 }
@@ -112,6 +116,7 @@ Template.playlistItem.events = {
     $(".playlistItem").each(function() {
       hitAreas[getDataId(this)] = getRectangle(this);
     });
+    hitAreas['trash'] = getRectangle($('#trash'));
     dragManager.start(e.pageX, e.pageY, hitAreas)
   }
 }
@@ -129,7 +134,11 @@ Template.playlistItem.offsetY = function() {
 }
 
 dragManager.drop = function(dragToken, dropToken) {
-  player.move(dragToken, dropToken);
+  console.log(dropToken)
+  if (dropToken == "trash")
+    player.remove(dragToken);
+  else
+    player.move(dragToken, dropToken);
 }
 
 // Forward required mousevents to DragManager instance.

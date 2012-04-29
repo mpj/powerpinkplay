@@ -34,6 +34,19 @@ body {
 	font-weight: bold;
 }
 
+#playlistView #trash {
+	background-color: red;
+	color: white;
+	position: fixed;
+	left: 0;
+	bottom: 0px;
+	width: 100%;
+	height: 40px;
+	font-size: 20px;
+	line-height: 40px;
+	visibility: hidden;
+}
+
 #playlistView h1 { margin-bottom: 20px;}
 .playlistItem { 
 	display: inline-block;

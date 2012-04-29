@@ -44,6 +44,10 @@ DragManager.prototype =  {
     return token;
   },
 
+  getIsDragging: function() {
+    return !!Session.get('dragOriginX');
+  },
+
   _tokenAt: function(x, y) {
     for (var token in this._hitAreas) {
       var r = this._hitAreas[token];
