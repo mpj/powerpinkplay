@@ -2,9 +2,11 @@
   <div id="playlistView" class="{{viewClass}}">
     {{> playlistHeader}}
     {{> playlistItems}}
+    
     <div id="addPlaylistItem">
       {{> addPlaylistItem}}
     </div>
+
   </div>  
 </template>
 
@@ -12,7 +14,7 @@
   <span class="loadingImage" {{#unless loading}}style="visibility:hidden"{{/unless}}>
     <div class="spinner" />
   </span>
-  <input id="playlistViewNew" class="new" />
+  <input id="playlistViewNew" />
   <div class="typeAheads">
     {{#each typeAheadResults}}
       <div class="{{class}}">{{label}}</div>

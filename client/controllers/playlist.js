@@ -13,7 +13,7 @@ Template.addPlaylistItem.typeAheadResults = function() {
 
 Template.addPlaylistItem.class = function() {
   var isSelected = typeAhead.isSelected(this);
-  return isSelected ? 'typeAhead selected' : 'typeAhead';
+  return isSelected ? 'option selected' : 'option';
 }
 
 Template.addPlaylistItem.loading = typeAhead.isLoading;
