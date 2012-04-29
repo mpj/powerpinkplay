@@ -1,8 +1,12 @@
 var dragManager = new DragManager;
 
 // This view should only be visible if we have navigated to a playlist.
-Template.playlist.viewClass = function () {
+Template.playlist.class = function () {
   return currentPlaylist() ? '' : 'hidden';
+}
+
+Template.playlist.playlistName = function () {
+  return !!currentPlaylist() ? currentPlaylist().name : '';
 }
 
 Template.addPlaylistItem.typeAheadResults = function() {
@@ -41,9 +45,7 @@ Template.addPlaylistItem.events = {
   
 }
 
-Template.playlistHeader.playlistName = function () {
-  return !!currentPlaylist() ? currentPlaylist().name : '';
-}
+
 
 Template.playlistItems.items = function () {
   if (!currentPlaylist()) return [];

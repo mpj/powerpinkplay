@@ -1,62 +1,66 @@
 <template name="playlist">
-  <div id="playlistView" class="{{viewClass}}">
-    {{> playlistHeader}}
-    {{> playlistItems}}
-    
-    <div id="addPlaylistItem">
-      {{> addPlaylistItem}}
-    </div>
-
+  <div id="playlist" class="{{class}}">
+    <h1>{{ playlistName }}</h1>
+    {{> playlistItems }}
+    {{> addPlaylistItem }}
   </div>  
-</template>
-
-<template name="addPlaylistItem">
-  <span class="loadingImage" {{#unless loading}}style="visibility:hidden"{{/unless}}>
-    <div class="spinner" />
-  </span>
-  <input id="playlistViewNew" />
-  <div class="typeAheads">
-    {{#each typeAheadResults}}
-      <div class="{{class}}">{{label}}</div>
-    {{/each}}
-  </div>
-</template>
-
-<template name="playlistHeader">
-  <span class="wrapper">
-    <h1>{{playlistName}}</h1>
-  </span>
 </template>
 
 <template name="playlistItems">
   <div id="playlistItems">
-    {{#each items}}
+    {{#each items }}
       {{> playlistItem }}
     {{/each}}
+    <div  id="trash" 
+      {{#if isDragging }}
+        style="visibility:visible"
+      {{/if}}>
+      Drop down here to delete
+    </div>
   </div>
-  
-  <div id="trash" {{#if isDragging}}style="visibility:visible"{{/if}}>Drop down here to delete</div>
 </template>
 
 <template name="playlistItem">
   <div  class="playlistItem" 
-          id="{{_id}}"
-          style="left:{{offsetX}}px;top:{{offsetY}}px">
-    <span class="playPauseIcon" id="playPauseIcon_{{_id}}">
-      <span class="clickArea" id="playPauseIcon_clickArea_{{_id}}"></span>
+          id="{{ _id }}"
+          style="left:{{ offsetX }}px;top:{{ offsetY }}px">
+
+    <span class="playPauseIcon" id="playPauseIcon_{{ _id }}">
+      <span class="clickArea" id="playPauseIcon_clickArea_{{ _id }}"></span>
       <i class="{{playPauseIconClass}}" />
     </span>
-    <span class="container" id="container_{{_id}}">
-      <span class="clickArea" id="container_clickArea_{{_id}}"></span>
-      <span class="name">{{name}}</span>
-      <span class="scrubber" style="width:{{needlePosition}}px"></span>
+
+    <span class="container" id="container_{{ _id }}">
+      <span class="clickArea" id="container_clickArea_{{ _id }}"></span>
+      <span class="name">{{ name }}</span>
+      <span class="scrubber" style="width:{{ needlePosition }}px"></span>
       <span class="background"></span>
     </span>
+
     <span class="moveIcon">
-      <span class="clickArea" id="moveIcon_clickArea_{{_id}}"></span>
+      <span class="clickArea" id="moveIcon_clickArea_{{ _id }}"></span>
       <i class="icon-move icon-white" />
     </span>
+
   </div>
-  <div class="{{placeHolderClassBelow}}" />
-  
+
+  <div class="{{ placeHolderClassBelow }}" />
+
+</template>
+
+<template name="addPlaylistItem">
+  <div id="addPlaylistItem">
+    <span class="loadingImage" 
+          {{#unless loading }} 
+            style="visibility:hidden" 
+          {{/unless}}>
+      <div class="spinner" />
+    </span>
+    <input id="playlistViewNew" />
+    <div class="typeAheads">
+      {{#each typeAheadResults }}
+        <div class="{{class}}">{{ label }}</div>
+      {{/each}}
+    </div>
+  </div>
 </template>
