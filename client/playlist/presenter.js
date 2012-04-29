@@ -100,7 +100,7 @@ PlaylistPresenter.prototype = {
       player.play(item);
   },
 
-  needlePosition: function(item) {
+  needleProgress: function(item) {
 
     var progress = this._player.getProgress(item);
     if (progress == 0) return 0;
@@ -112,9 +112,7 @@ PlaylistPresenter.prototype = {
       }, 250);
     }
 
-    // FIXME: Assign this from outside
-    var scrubberWidth = $('.playlistItem .container').width();
-    return Math.floor(scrubberWidth * progress);
+    return progress;
   },
 
   containerClicked: function(item, progress) {

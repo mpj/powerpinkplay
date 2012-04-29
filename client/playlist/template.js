@@ -64,8 +64,11 @@
   Template.playlistItem.playPauseIconClass =
     function() { return presenter.playPauseIconClass(this) }
 
-  Template.playlistItem.needlePosition = 
-    function() { return presenter.needlePosition(this) }
+  Template.playlistItem.needlePosition = function() { 
+    var progress = presenter.needleProgress(this),
+        scrubberWidth = $('.playlistItem .container').width();
+    return Math.floor(scrubberWidth * progress);
+  }
 
   Template.playlistItem.events = {
     
