@@ -1,9 +1,5 @@
 var dragManager = new DragManager;
 
-var KEY_CODE_ARROW_DOWN = 40,
-    KEY_CODE_ARROW_UP   = 38,
-    KEY_CODE_ENTER      = 13;
-
 // This view should only be visible if we have navigated to a playlist.
 Template.playlist.viewClass = function () {
   return currentPlaylist() ? '' : 'hidden';
