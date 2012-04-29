@@ -3,7 +3,9 @@ Template.createPlaylist.viewClass = function () {
 }
 
 function createPlaylist() {
-  var playlist = player.create($('#createPlaylistView .name').val());
+  var name = $('#createPlaylistView .name').val().trim();
+  if (name.length == 0) return;
+  var playlist = player.create(name);
   Meteor.router.navigate("p/" + playlist.name_simple + "/", {trigger: true});
 }
 
