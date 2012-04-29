@@ -241,4 +241,13 @@ h1 { font-family: 'Just Me Again Down Here', cursive;
 	z-index: 999;
 }
 
+#attribution { 
+	color: white; 
+	position: fixed;
+	font-size: 9px;
+	right: 5px;
+	bottom: 3px;
+	z-index: 0;
+	font-family: Arial; }
 
+#attribution a { color: white; text-decoration: underline;  }
