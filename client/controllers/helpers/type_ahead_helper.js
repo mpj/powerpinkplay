@@ -1,21 +1,31 @@
 TypeAheadHelper = function(searcher) {
   this._searcher = searcher;
+  this._timeoutHandle = null;
 }
 
 TypeAheadHelper.prototype = {
   
   query: function(query) {
-    Session.set('typeAheadIsLoading', true);
-    this._searcher.search(query, function(error, results) {
-      Session.set('typeAheadIsLoading', false);
-      if(error)
-        return; // Do nothing, yet.
-      if (results.length == 0)
-        return; // Don't replace with empty
+    
+    // Wrap within a clearing timeout
+    // to prevent API spamming
+    clearTimeout(this._timeoutHandle);
+    var that = this, sess = Session;
+    this._timeoutHandle = Meteor.setTimeout(function() {
+      sess.set('typeAheadIsLoading', true);
+      that._searcher.search(query, function(error, results) {
+        sess.set('typeAheadIsLoading', false);
+        if(error)
+          return; // Do nothing, yet.
+        if (results.length == 0)
+          return; // Don't replace with empty
 
-      Session.set('typeAheadSelectedIndex', 0)
-      Session.set('typeAheadResults', results.slice(0, 5));
-    })
+        sess.set('typeAheadSelectedIndex', 0)
+        sess.set('typeAheadResults', results.slice(0, 5));
+      })
+    },250);
+
+    
   },
 
   isLoading: function() {
