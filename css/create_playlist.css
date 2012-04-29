@@ -1,0 +1,40 @@
+#createPlaylistView {
+	position: absolute;
+	top: 200px;
+	left: 120px;
+	text-align: left;
+	padding: 40px;
+	width: 500px;
+	height: 120px;
+}
+
+#createPlaylistView .content {
+	position: absolute;
+	z-index: 10;
+}
+#createPlaylistView .content h1 {
+	margin-bottom: 45px;
+	color: white;
+}
+#createPlaylistView .content input.name {
+	font-size: 20px;
+	height: 30px;
+	width: 300px;
+}
+#createPlaylistView .content input.do {
+	font-size: 20px;
+	height: 40px;
+	width: 80px;
+	margin-left: 10px;
+}
+#createPlaylistView .background {
+	z-index: 9;
+	position: absolute;
+	left:0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	border: 0;
+	opacity: 0.65;
+}

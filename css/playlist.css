@@ -1,0 +1,177 @@
+#playlistView h1 { margin-bottom: 20px;}
+
+#playlistView {
+	display: inline-block;
+	width: 550px;
+	margin-top: 120px;
+	margin-bottom: 400px;
+}
+
+#playlistView .play {
+	padding: 10px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+#playlistView #trash {
+	background-color: white;
+	color: black;
+	font-weight: bold;
+	position: fixed;
+	left: 0;
+	bottom: 0px;
+	width: 100%;
+	height: 40px;
+	font-size: 20px;
+	line-height: 40px;
+	visibility: hidden;
+	z-index: 9999;
+}
+
+.playlistItem { 
+	display: inline-block;
+	position: relative;
+	clear: both;
+	width: 550px;
+	left: -25px;
+	height: 30px;
+	margin-bottom: 15px;
+	font-size: 18px;
+	text-align: left;
+	cursor: default;
+	z-index: 99999;
+}
+.playlistItem .playPauseIcon {
+	position: absolute;
+	display: inline-block;
+	left: 0;
+	width: 25px;
+	height: 30px;
+	cursor: pointer;
+}
+.playlistItem .playPauseIcon i {
+	position: absolute;
+	top: 7px;
+}
+.playlistItem .container {
+	position: absolute;
+	display: inline-block;
+	width: 500px;
+	height: 100%;
+	left: 25px;
+	box-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+}
+
+.playlistItem .container .name {
+	position: absolute;
+	z-index: 3;
+	color: white;
+	top: 5px;
+	left: 10px;
+	overflow: hidden;
+	width: 485px;
+	height: 100%;
+	line-height: 100%;
+	display: block;
+	white-space: nowrap; 
+}
+.playlistItem .container .scrubber {
+	position: absolute;
+	height: 30px;
+	top: 0;
+	background-color: #FF0066;
+	z-index: 2;
+}
+.playlistItem .container .background {
+	background-color: #000000;
+	width: 500px;
+	height: 30px;
+	position: absolute;
+	opacity: 0.65;
+	z-index: 1;
+}
+.playlistItem .moveIcon {
+	position: absolute;
+	right: 0;
+	width: 25px;
+	height: 100%;
+}
+.playlistItem .moveIcon i {
+	position: absolute;
+	left: 10px;
+	top: 7px;
+}
+.placeholder {
+	display: block;
+	width: 500px;
+	margin-left: 25px;
+	background-color: #000000;
+	opacity: 0.4;
+	height: 30px;
+	margin-bottom: 15px;
+}
+
+#addPlaylistItem { width: 100%; }
+
+#addPlaylistItem .loadingImage {
+	display: inline-block;
+	position: relative;
+	float: left;
+	width: 25px;
+	height: 30px;
+}
+
+#addPlaylistItem .loadingImage .spinner {
+	position: absolute;
+	left: -4px;
+	top: 3px;
+	background-color: rgba(0,0,0,0);
+	border:4px solid rgba(255,255,255,0.7);
+	opacity:.7;
+	border-right:4px solid rgba(0,0,0,0);
+	border-left:4px solid rgba(0,0,0,0);
+	border-radius:12px;
+	width:12px;
+	height:12px;
+	margin:0 auto;
+	-moz-animation:spinPulse 0.7s infinite ease-in-out;
+	-webkit-animation:spinPulse 0.7s infinite linear;
+}
+@-moz-keyframes spinPulse {
+	0% { -moz-transform:rotate(160deg); opacity:0; }
+	25% { -moz-transform:rotate(145deg); opacity:1; }
+	100% { -moz-transform:rotate(-320deg); opacity:0; }
+}
+@-webkit-keyframes spinPulse {
+	0% { -webkit-transform:rotate(160deg); opacity:0; }
+	25% { -webkit-transform:rotate(145deg); opacity:1;}
+	100% { -webkit-transform:rotate(-320deg); opacity:0; }
+}
+
+
+#addPlaylistItem input { 
+	display: inline-block;
+	float:left;
+	width: 490px; 
+	font-size: 18px;
+}
+
+#addPlaylistItem .option { 
+	text-align: left;
+	font-size: 14px;
+	line-height: 22px;
+	width: 465px;
+	margin-left: 28px;
+	white-space: nowrap;
+	overflow: hidden;
+	color: white;
+	padding-left: 5px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	opacity: 0.7;
+}
+
+#addPlaylistItem .option.selected {
+	font-weight: bold;
+	opacity: 1;
+}
