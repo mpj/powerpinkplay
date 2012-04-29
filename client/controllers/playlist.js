@@ -19,7 +19,7 @@ Template.addPlaylistItem.class = function() {
   return isSelected ? 'option selected' : 'option';
 }
 
-Template.addPlaylistItem.loading = typeAhead.isLoading;
+Template.addPlaylistItem.isLoading = typeAhead.isLoading;
 
 Template.addPlaylistItem.events = {
   'focusout input': function(e) {
