@@ -4,7 +4,7 @@ A sample app to demonstrate how a real-time collaborative music player would be 
 
 Structure
 -------------
-The structure of the app is a variant of Model-View-Presenter, with heavy inspiration taken from the MVVM pattern. The views each have their own subdirectory with the following structure:
+The structure of the app is a variant of MVP (http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter)mixed up a bit with the MVVM pattern (http://addyosmani.com/blog/understanding-mvvm-a-guide-for-javascript-developers/). The views each have their own subdirectory with the following structure:
 
 create_playlist <- The name of the view
 	
