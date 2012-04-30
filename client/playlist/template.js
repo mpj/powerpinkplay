@@ -14,7 +14,7 @@
     function() { return presenter.items() }
 
   Template.playlistItems.isTrashVisible = 
-    function() { return presenter.isTrashVisible() }
+    function() { return presenter.isDragging() }
 
 
 
@@ -70,6 +70,15 @@
     return Math.floor(scrubberWidth * progress);
   }
 
+  Template.playlistItem.isPlaceholderVisible = 
+    function() { return presenter.isHovering(this) }
+
+  Template.playlistItem.offsetX = 
+    function() { return presenter.dragDeltaX(this) }
+
+  Template.playlistItem.offsetY = 
+    function() { return presenter.dragDeltaY(this) }
+
   Template.playlistItem.events = {
     
     'click .playPauseIcon .clickArea': function(e) {
@@ -116,15 +125,6 @@
     }
 
   }
-
-  Template.playlistItem.isPlaceholderVisible = 
-    function() { return presenter.isHovering(this) }
-
-  Template.playlistItem.offsetX = 
-    function() { return presenter.dragDeltaX(this) }
-
-  Template.playlistItem.offsetY = 
-    function() { return presenter.dragDeltaY(this) }
 
   $(document)
     .mouseup(function() { presenter.mouseup() })
