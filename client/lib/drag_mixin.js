@@ -1,4 +1,4 @@
-DragPresenterMixin = {
+DragMixin = {
 
   dragStarted: function(x, y, hitAreas) {
     this._hitAreas = hitAreas;

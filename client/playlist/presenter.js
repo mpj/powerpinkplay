@@ -8,7 +8,7 @@ function PlaylistPresenter(player, searcher) {
   
 }
 
-_.extend(PlaylistPresenter.prototype, DragPresenterMixin);
+_.extend(PlaylistPresenter.prototype, DragMixin);
 _.extend(PlaylistPresenter.prototype, TypeAheadMixin);
 _.extend(PlaylistPresenter.prototype, {
 
