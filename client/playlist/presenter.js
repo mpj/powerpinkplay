@@ -37,14 +37,12 @@ _.extend(PlaylistPresenter.prototype, {
   },
 
 
-  // Typeahead...
-
   addPlaylistItemTextInputBlur: function() {
-    this._hideTypeAhead();
+    this.hideTypeAhead();
   },
 
   addPlaylistItemTextInputFocus: function() {
-    this._showTypeAhead();
+    this.showTypeAhead();
   },
 
   addPlaylistItemTextInputEnterPressed: function() {
@@ -58,14 +56,6 @@ _.extend(PlaylistPresenter.prototype, {
       playlistId
     );
     this.clearTypeAhead();
-  },
-
-  addPlaylistItemTextInputArrowDown: function() {
-    this._typeAheadHelper.selectNext();
-  },
-
-  addPlaylistItemTextInputArrowUp: function() {
-    this._typeAheadHelper.selectPrevious();
   },
 
   playPauseIconClass: function(item) {

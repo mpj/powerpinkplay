@@ -44,11 +44,11 @@ TypeAheadMixin = {
     return Session.set('typeAheadResults', null);
   },
 
-  _hideTypeAhead: function() {
+  hideTypeAhead: function() {
     Session.set('typeAheadVisible', false);
   },
 
-  _showTypeAhead: function() {
+  showTypeAhead: function() {
     Session.set('typeAheadVisible', true);
   },
 
