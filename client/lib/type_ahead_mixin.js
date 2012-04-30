@@ -1,17 +1,15 @@
-TypeAheadHelper = function(searcher) {
-  this._searcher = searcher;
-  this._timeoutHandle = null;
-}
-
-TypeAheadHelper.prototype = {
+TypeAheadMixin = {
   
-  query: function(query) {
+  queryTypeAhead: function(query) {
+
+    if (!this._searcher || !this._searcher.search)
+      throw new Error("TypeAheadMixin requires _searcher to be defined.")
     
     Session.set('typeAheadIsLoading', true);
 
     // Wrap within a clearing timeout
     // to prevent API spamming
-    clearTimeout(this._timeoutHandle);
+    if (this._timeoutHandle) clearTimeout(this._timeoutHandle);
     var that = this, sess = Session;
     this._timeoutHandle = Meteor.setTimeout(function() {
       that._searcher.search(query, function(error, results) {
@@ -29,43 +27,51 @@ TypeAheadHelper.prototype = {
     
   },
 
-  isLoading: function() {
+  typeAheadResults: function() {
+    if (!Session.get('typeAheadVisible')) return [];
+    return Session.get('typeAheadResults') || [];
+  },
+
+  isTypeAheadSelected: function(item) {
+    return item == this._getSelectedTypeAhead();
+  },
+
+  isTypeAheadLoading: function() {
     return !!Session.get('typeAheadIsLoading');
   },
 
-  isSelected: function(item) {
-    var results = Session.get('typeAheadResults');
-    if (!results) return false;
-    return item == this.getSelected();
+  clearTypeAhead: function() {
+    return Session.set('typeAheadResults', null);
   },
 
-  selectNext: function() {
+  _hideTypeAhead: function() {
+    Session.set('typeAheadVisible', false);
+  },
+
+  _showTypeAhead: function() {
+    Session.set('typeAheadVisible', true);
+  },
+
+  selectNextTypeAhead: function() {
     this._moveIndex(+1);
   },
 
-  selectPrevious: function() {
+  selectPreviousTypeAhead: function() {
     this._moveIndex(-1);
   },
 
-  getSelected: function() {
+  _getSelectedTypeAhead: function() {
     if(Session.get('typeAheadSelectedIndex') < 0) return null;
     var results = Session.get('typeAheadResults');
     if(!results) return null;
     return results[Session.get('typeAheadSelectedIndex')];
   },
 
-  results: function() {
-    return Session.get('typeAheadResults');
-  },
-
-  clear: function() {
-    return Session.set('typeAheadResults', null);
-  },
-  
   _moveIndex: function(delta) {
     var newIndex = Session.get('typeAheadSelectedIndex') + delta;
     var results = Session.get('typeAheadResults');
     if(results && results[newIndex])
       Session.set('typeAheadSelectedIndex', newIndex)  
-  }  
+  } 
+
 }

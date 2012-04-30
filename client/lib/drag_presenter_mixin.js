@@ -37,7 +37,6 @@ DragPresenterMixin = {
     var id = idOrItem._id || idOrItem;
     return this._getHoveredId() == id;
   },
-
   
   isDragging: function() {
     return !!Session.get('dragOriginX');

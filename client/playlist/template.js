@@ -1,5 +1,6 @@
 (function() {
-      presenter = new PlaylistPresenter(player, typeAhead);
+  
+  var presenter = new PlaylistPresenter(player, spotifyTrackSearch);
 
   Template.playlist.isVisible = 
     function() { return presenter.isVisible() }
@@ -24,7 +25,7 @@
     function() { return presenter.isTypeAheadSelected(this) }
   
   Template.addPlaylistItem.isLoading = 
-    function() { return presenter.isLoading(this) }
+    function() { return presenter.isTypeAheadLoading(this) }
 
   Template.addPlaylistItem.events = {
     
@@ -44,13 +45,13 @@
           break;
         
         case KEY_CODE_ARROW_DOWN:
-          return presenter.addPlaylistItemTextInputArrowDown();
+          return presenter.selectNextTypeAhead();
 
         case KEY_CODE_ARROW_UP:
-          return presenter.addPlaylistItemTextInputArrowUp();
+          return presenter.selectPreviousTypeAhead();
 
         default:
-          return presenter.addPlaylistItemTextInputChanged(e.target.value);
+          return presenter.queryTypeAhead(e.target.value);
 
       }
         

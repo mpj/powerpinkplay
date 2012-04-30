@@ -1,14 +1,15 @@
 PlaylistPresenter.prototype = new BasePresenter();
 PlaylistPresenter.prototype.constructor = PlaylistPresenter;
 
-function PlaylistPresenter(player, typeAheadHelper) {
+function PlaylistPresenter(player, searcher) {
   
-  this._typeAheadHelper = typeAheadHelper;
   this._player = player;
+  this._searcher = searcher;
   
 }
 
 _.extend(PlaylistPresenter.prototype, DragPresenterMixin);
+_.extend(PlaylistPresenter.prototype, TypeAheadMixin);
 _.extend(PlaylistPresenter.prototype, {
 
   // Playlist itself ...
@@ -38,29 +39,16 @@ _.extend(PlaylistPresenter.prototype, {
 
   // Typeahead...
 
-  typeAheadResults: function() {
-    if (!Session.get('typeAheadFocus')) return [];
-    return this._typeAheadHelper.results();
-  },
-
-  isTypeAheadSelected: function(item) {
-    return this._typeAheadHelper.isSelected(item);
-  },
-
-  isLoading: function(item) {
-    return this._typeAheadHelper.isLoading(item);
-  },
-
   addPlaylistItemTextInputBlur: function() {
-    Session.set('typeAheadFocus', false);
+    this._hideTypeAhead();
   },
 
   addPlaylistItemTextInputFocus: function() {
-    Session.set('typeAheadFocus', true);
+    this._showTypeAhead();
   },
 
   addPlaylistItemTextInputEnterPressed: function() {
-    var selected = this._typeAheadHelper.getSelected(),
+    var selected = this._getSelectedTypeAhead(),
         playlistId = this._getCurrentPlaylist()._id;
     if(!selected) return;
     this._player.add(
@@ -69,7 +57,7 @@ _.extend(PlaylistPresenter.prototype, {
       selected.data.duration, 
       playlistId
     );
-    this._typeAheadHelper.clear();
+    this.clearTypeAhead();
   },
 
   addPlaylistItemTextInputArrowDown: function() {
@@ -78,10 +66,6 @@ _.extend(PlaylistPresenter.prototype, {
 
   addPlaylistItemTextInputArrowUp: function() {
     this._typeAheadHelper.selectPrevious();
-  },
-
-  addPlaylistItemTextInputChanged: function(val) {
-    this._typeAheadHelper.query(val);
   },
 
   playPauseIconClass: function(item) {
