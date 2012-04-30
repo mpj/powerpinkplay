@@ -1,21 +1,14 @@
 PlaylistPresenter.prototype = new BasePresenter();
 PlaylistPresenter.prototype.constructor = PlaylistPresenter;
 
-function PlaylistPresenter(player, dragHelper, typeAheadHelper) {
+function PlaylistPresenter(player, typeAheadHelper) {
   
   this._typeAheadHelper = typeAheadHelper;
   this._player = player;
-
-  this._dragHelper = dragHelper;
-  this._dragHelper.drop = function(dragToken, dropToken) {
-    if (dropToken == "trash")
-      player.remove(dragToken);
-    else
-      player.move(dragToken, dropToken);
-  }
   
 }
 
+_.extend(PlaylistPresenter.prototype, DragPresenterMixin);
 _.extend(PlaylistPresenter.prototype, {
 
   // Playlist itself ...
@@ -121,28 +114,11 @@ _.extend(PlaylistPresenter.prototype, {
     this._player.play(item, progress);
   },
 
-  dragStarted: function(x, y, hitAreas) {
-    this._dragHelper.start(x, y, hitAreas);
-  },
-
-  isPlaceholderVisible: function(item) {
-    return item._id == this._dragHelper.getHoveredToken();
-  },
-
-  getOffsetX: function(item) {
-    return this._dragHelper.getDeltaX(item._id);
-  },
-
-  getOffsetY: function(item) {
-    return this._dragHelper.getDeltaY(item._id);
-  },
-
-  mouseup: function() {
-    this._dragHelper.mouseup()
-  },
-
-  mousemove: function(x, y) {
-    this._dragHelper.mousemove(x, y);    
+  _drop: function(dragToken, dropToken) {
+    if (dropToken == "trash")
+      player.remove(dragToken);
+    else
+      player.move(dragToken, dropToken);
   }
   
 })

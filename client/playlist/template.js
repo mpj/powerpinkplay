@@ -1,6 +1,5 @@
 (function() {
-  var dragHelper = new DragHelper,
-      presenter = new PlaylistPresenter(player, dragHelper, typeAhead);
+      presenter = new PlaylistPresenter(player, typeAhead);
 
   Template.playlist.isVisible = 
     function() { return presenter.isVisible() }
@@ -118,13 +117,13 @@
   }
 
   Template.playlistItem.isPlaceholderVisible = 
-    function() { return presenter.isPlaceholderVisible(this) }
+    function() { return presenter.isHovering(this) }
 
   Template.playlistItem.offsetX = 
-    function() { return presenter.getOffsetX(this) }
+    function() { return presenter.dragDeltaX(this) }
 
   Template.playlistItem.offsetY = 
-    function() { return presenter.getOffsetY(this) }
+    function() { return presenter.dragDeltaY(this) }
 
   $(document)
     .mouseup(function() { presenter.mouseup() })
