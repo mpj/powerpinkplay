@@ -1,3 +1,5 @@
+// TODO: Sorry, this is not very clean at the moment. If it grows, find a better structure!
+
 var serverTime = new ServerTime,
     player = new Player(serverTime);
 
