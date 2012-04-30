@@ -1,12 +1,16 @@
-CreatePlaylistPresenter = function(player) {
+
+CreatePlaylistPresenter.prototype = new BasePresenter();
+CreatePlaylistPresenter.prototype.constructor = CreatePlaylistPresenter;
+
+function CreatePlaylistPresenter(player) {
   this._nameInputValue = null;
   this._player = player;
 }
 
-CreatePlaylistPresenter.prototype = {
+_.extend(CreatePlaylistPresenter.prototype, {
 
   isVisible: function() {
-    return !currentPlaylist();
+    return !this._getCurrentPlaylist();
   },
   
   nameInputValueChanged: function(newValue) {
@@ -28,4 +32,4 @@ CreatePlaylistPresenter.prototype = {
     Meteor.router.navigate("p/" + playlist.name_simple + "/", { trigger: true });
   }
   
-}
+})

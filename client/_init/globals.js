@@ -6,10 +6,3 @@ typeAhead = new TypeAheadHelper(spotifyTrackSearch);
 var KEY_CODE_ARROW_DOWN = 40,
     KEY_CODE_ARROW_UP   = 38,
     KEY_CODE_ENTER      = 13;
-
-function currentPlaylist() {
-  return Playlists.findOne({ 
-    name_simple: 
-      Session.get('currentPlayListSimpleName')
-  });
-}

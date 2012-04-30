@@ -1,4 +1,7 @@
-PlaylistPresenter = function(player, dragHelper, typeAheadHelper) {
+PlaylistPresenter.prototype = new BasePresenter();
+PlaylistPresenter.prototype.constructor = PlaylistPresenter;
+
+function PlaylistPresenter(player, dragHelper, typeAheadHelper) {
   
   this._typeAheadHelper = typeAheadHelper;
   this._player = player;
@@ -10,30 +13,29 @@ PlaylistPresenter = function(player, dragHelper, typeAheadHelper) {
     else
       player.move(dragToken, dropToken);
   }
-
   
 }
 
-PlaylistPresenter.prototype = {
+_.extend(PlaylistPresenter.prototype, {
 
   // Playlist itself ...
 
   isVisible: function() {
     // This view should only be visible if 
     // we have navigated to a playlist.
-    return !!currentPlaylist();
+    return !!this._getCurrentPlaylist();
   },
 
   headerText: function() {
-    return !!currentPlaylist() ? currentPlaylist().name : '';
+    return !!this._getCurrentPlaylist() ? this._getCurrentPlaylist().name : '';
   },
 
 
   // Items ... 
 
   items: function () {
-    if (!currentPlaylist()) return [];
-    return player.items(currentPlaylist());
+    if (!this._getCurrentPlaylist()) return [];
+    return player.items(this._getCurrentPlaylist());
   },
 
   isTrashVisible: function() {
@@ -66,7 +68,7 @@ PlaylistPresenter.prototype = {
 
   addPlaylistItemTextInputEnterPressed: function() {
     var selected = this._typeAheadHelper.getSelected(),
-        playlistId = currentPlaylist()._id;
+        playlistId = this._getCurrentPlaylist()._id;
     if(!selected) return;
     this._player.add(
       selected.label, 
@@ -142,11 +144,5 @@ PlaylistPresenter.prototype = {
   mousemove: function(x, y) {
     this._dragHelper.mousemove(x, y);    
   }
-
-
-
-
-
-
   
-}
+})
