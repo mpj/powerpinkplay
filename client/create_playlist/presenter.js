@@ -1,4 +1,3 @@
-
 CreatePlaylistPresenter.prototype = new BasePresenter();
 CreatePlaylistPresenter.prototype.constructor = CreatePlaylistPresenter;
 

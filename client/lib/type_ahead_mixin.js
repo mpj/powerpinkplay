@@ -1,5 +1,19 @@
+/**
+ *  Mixin for supporting typeahead behaviour in reactive 
+ *  presenters. Is generalized and not tied to PowerPinkPlay. 
+ */
+
 TypeAheadMixin = {
   
+  /**
+   * Executes the query. 
+   * Requires _searcher to be defined on the mixed-in class,
+   *  which is an object that defines search(query, callback).
+   *  
+   *  TODO: Make the _searcher some kind of interface, most likely
+   *  a base class that SpotifyTrackSearch and RdioSearch etc. inherits from.
+   *  Alternatively, make it more simple and just an argument to the function.
+  */ 
   queryTypeAhead: function(query) {
 
     if (!this._searcher || !this._searcher.search)
@@ -17,14 +31,14 @@ TypeAheadMixin = {
         if(error)
           return; // Do nothing, yet.
         if (results.length == 0)
-          return; // Don't replace with empty
+          return; // Don't replace with empty data.
 
+        results = results.slice(0, 5); // Pick the first five
         sess.set('typeAheadSelectedIndex', 0)
-        sess.set('typeAheadResults', results.slice(0, 5));
+        sess.set('typeAheadResults', results);
       })
-    },250);
+    }, 250);
 
-    
   },
 
   typeAheadResults: function() {
@@ -53,11 +67,11 @@ TypeAheadMixin = {
   },
 
   selectNextTypeAhead: function() {
-    this._moveIndex(+1);
+    this._typeAheadMoveIndex(+1);
   },
 
   selectPreviousTypeAhead: function() {
-    this._moveIndex(-1);
+    this._typeAheadMoveIndex(-1);
   },
 
   _getSelectedTypeAhead: function() {
@@ -67,7 +81,7 @@ TypeAheadMixin = {
     return results[Session.get('typeAheadSelectedIndex')];
   },
 
-  _moveIndex: function(delta) {
+  _typeAheadMoveIndex: function(delta) {
     var newIndex = Session.get('typeAheadSelectedIndex') + delta;
     var results = Session.get('typeAheadResults');
     if(results && results[newIndex])

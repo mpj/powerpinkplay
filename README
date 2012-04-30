@@ -1,0 +1,37 @@
+PowerPinkPlay
+==========
+A sample app to demonstrate how a real-time collaborative music player would be implemented using Meteor (http://meteor.com). Try it out on http://powerpinkplay.com, add tracks, scrub, play, pause, reorder and remove tracks, and make sure you try it with the same playlist open in two browers at the same time. It's soooooo cooool!!! It does, unfortunately, not play any actual music yet.
+
+Structure
+-------------
+The structure of the app is a variant of Model-View-Presenter, with heavy inspiration taken from the MVVM pattern. The views each have their own subdirectory with the following structure:
+
+create_playlist <- The name of the view
+	
+	template.html
+	The template and child templates/partials. This could be referred to as the view, if you will.
+
+	style.css
+	The CSS specific to this view.
+
+	presenter.js
+	The presenter for the view - this contains all the logic, and is meant to be an abstract representation of the state of the view. The idea is that the only things the view does are listening to the presenter and mimicing it, and forwarding any user interaction events to the presenter.  The presenter is blissfully unaware of how the view actually looks, and doesn't know about the DOM. This is really good for keeping your application loosely coupled, and is awesome for testability.
+
+	template.js
+	Basically glue between template.html and presenter.js. I'd like to experiment with getting rid of some glue (with some fancy metaprogramming, perhaps), because it certainly isn't very DRY, but time doesn't allow me at the moment.
+
+NOTE: This is probably NOT the most awesome way this can be done, I see PowerPinkPlay as an experiment on how you can structure meteor using Model-View-Presenter, and just check out what happens.
+
+Mixins
+-----------------------
+MVP is kind of my go-to-tool when developing advanced clients apps, and while I find it extremely versatile and nice to work with, it does have the drawback that a lot of existing plugins just doesn't mesh well with the pattern. It turns messy, and breaks the nice decoupling that MVP offers. So, when developing this, I wrote two generalized mixins - one for handling drag-n-drop (for sorting the songs in the playlist) and one for handling typeahead from presenters. Methinks they will come in handy some day. If we continued developing this very app, the typeahead could be mixed in with create_playlist to have the playlist creation field double as a playlist search, perhaps. 
+
+Reactive programming
+-----------------------
+I really, really like reactive programming (http://en.wikipedia.org/wiki/Reactive_programming). I have worked a lot in Adobe Flex, and as much as a I loathe it in many ways, it's reactive bidnings are very powerful, and almost offers a completely new way of programming if you do it right. The Meteor framework excites me tremedously, because it makes the client reactive to server events in a very transparent way that is TOTALLY SUPER AWESOME. It does look very magic, but it's actually not all that complicated - the gist of it is explained here: http://docs.meteor.com/#reactivity
+
+
+Authentication
+-----------------------
+Authentication is not yet implemented in Meteor, and I have not bothered to implement it myself either. Any further work would probably involve making some rudimentary authenticaton and doing some more selective publishing, instead of using the crazy default autopublish of Meteor.
+
