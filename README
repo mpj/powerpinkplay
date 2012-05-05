@@ -2,6 +2,19 @@ PowerPinkPlay
 ==========
 A sample app to demonstrate how a real-time collaborative music player would be implemented using Meteor (http://meteor.com). Try it out on http://powerpinkplay.com, add tracks, scrub, play, pause, reorder and remove tracks, and make sure you try it with the same playlist open in two browers at the same time. It's soooooo cooool!!! It does, unfortunately, not play any actual music yet.
 
+
+How to get it running on your machine
+==============================
+1. Install meteor
+$ curl install.meteor.com | /bin/sh
+
+2. Check out the project
+git clone git://github.com/mpj/powerpinkplay.git
+
+3. Run it!
+cd powerpinkplay && meteor
+
+
 Structure
 -------------
 This little app is also an experiment on how to implemented the Model-View-ViewModel (MVVM) pattern (http://addyosmani.com/blog/understanding-mvvm-a-guide-for-javascript-developers/) in Meteor, since I felt that it's very suited for it. The views each have their own subdirectory with the following structure:
