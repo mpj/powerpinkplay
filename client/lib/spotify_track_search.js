@@ -1,3 +1,5 @@
+
+// A Spotify  track search function, for use in the TypeAheadMixin.
 spotifyTrackSearch = function(query, callback) {
   var uri = "http://ws.spotify.com/search/1/track.json?q=" + query;
   Meteor.http.call("GET", uri, {}, function (error, result) {
