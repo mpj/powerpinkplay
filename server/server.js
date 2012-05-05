@@ -53,20 +53,25 @@ var handle = query.observe({
  */
 function checkForSkipping(playlistItemId) {
     var pli = PlaylistItems.findOne(playlistItemId),
-        isStillPlaying = !!pli.playing_since,
-        isPastEnd = ((Number(new Date()) - pli.playing_since + pli.position)) > pli.duration;
+        now  = Number(new Date()),
+        hasPlayedPastEnd =  !!pli.playing_since && 
+                            now - pli.playing_since + pli.position > pli.duration;
+        
+    if (hasPlayedPastEnd) {
 
-    if (!isStillPlaying) {
-      // Not playing anymore (somebody probably changed tracks, or scrubbed)
-      return;
+      // Is playing, and has went past the end of the track. 
+      // This means that we should skip to the next track.
+      var nextSibling = findNextSibling(pli);
+      if (nextSibling) player.play(nextSibling);
+
+    } else {
+
+      // Do nothing - this playlistItem did not play past 
+      // end when we expected it to - somebody probably 
+      // changed tracks, or scrubbed.
+      
     }
-    
-    if(isPastEnd) {
-        // Is playing, and has went past the end of the track. 
-        // This means that we should skip to the next track.
-        var nextSibling = findNextSibling(pli);
-        if (nextSibling) player.play(nextSibling);
-    }
+  
 }
 
 /*
