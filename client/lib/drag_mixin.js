@@ -1,13 +1,10 @@
 /*
- * Mixin that helps implement drag-n-drop
- * in reactive presenters. This is generalized
+ * Mixin that helps implement drag-n-drop sorting
+ * in reactive presenters. This is pretty generalized
  * and not tied to PowerPinkPlay, and can be used
- * for future senarios. 
- * 
+ * for future senarios with very little work.
  * 
  * TODO: Change naming to reduce chance for conflicts
- * TODO: Consider creating your own reactive context, 
- * instead of piggybacking on Session.
  *
  */
 
@@ -31,24 +28,32 @@ DragMixin = {
         '123abc': { x1: 121, x2:233, y1:101,  y2: 200 }, 
         '278xka': { x1: 124, x2:727, y1:19,   y2: 59 }
       }
+   *  
+   *  @spacing The amount of space the placholder takes up, including margin.
    *
    */
   dragStarted: function(x, y, hitAreas, spacing) {
     this._hitAreas = hitAreas;
-    var id = this._idAt(x, y);
     this._spacing = spacing || 0;
-    Session.set('dragKey', id);
-    Session.set('dragOriginX', x);
-    Session.set('dragOriginY', y);
+
+    // NOTE: We are using the Meteor Session object to store these 
+    // values. The ONLY reason we do this is to get these values to be
+    // reactive (http://docs.meteor.com/#reactivity). With more time, I'd 
+    // definitely give this mixin it's own reactive context instead 
+    // of piggybacking on the Session.
+    Session.set('__dragId', this._idAt(x, y));
+    Session.set('__dragOriginX', x);
+    Session.set('__dragOriginY', y);
   },
 
   /**
    * This needs to be called repeatedly to keep the
-   * mixin informed about the outside world.
+   * mixin informed about the outside world (as presenters are not
+   * aware of the DOM.
    */
   mousemove: function(x, y) {
-    Session.set('mouseX', x);
-    Session.set('mouseY', y);
+    Session.set('__mouseX', x);
+    Session.set('__mouseY', y);
   },
 
   /**
@@ -60,18 +65,18 @@ DragMixin = {
     if (this._drop) {
       var dropBelowId = this._getHoveringBelowId();
       if (dropBelowId) {
-        this._drop(Session.get('dragKey'), dropBelowId);
+        this._drop(Session.get('__dragId'), dropBelowId);
       } else {
         var dropOnTopOfId = this._getHoveringOnTopOfId();
         if (dropOnTopOfId) 
-          this._drop(Session.get('dragKey'), dropOnTopOfId);
+          this._drop(Session.get('__dragId'), dropOnTopOfId);
       }
 
     }
     
-    Session.set('dragOriginX', null);
-    Session.set('dragOriginY', null);
-    Session.set('dragKey', null)
+    Session.set('__dragOriginX', null);
+    Session.set('__dragOriginY', null);
+    Session.set('__dragId', null)
   },
 
   /**
@@ -79,8 +84,8 @@ DragMixin = {
    */
   dragDeltaY: function(idOrItem) {
     var id = idOrItem._id || idOrItem;
-    if (Session.get('dragKey') != id) return 0;
-    return Session.get('mouseY') - Session.get('dragOriginY');
+    if (Session.get('__dragId') != id) return 0;
+    return Session.get('__mouseY') - Session.get('__dragOriginY');
   },
 
   /**
@@ -88,8 +93,8 @@ DragMixin = {
    */
   dragDeltaX: function(idOrItem) { 
     var id = idOrItem._id || idOrItem;
-    if (Session.get('dragKey') != id) return 0;
-    return Session.get('mouseX') - Session.get('dragOriginX');
+    if (Session.get('__dragId') != id) return 0;
+    return Session.get('__mouseX') - Session.get('__dragOriginX');
   },
 
   /**
@@ -107,39 +112,48 @@ DragMixin = {
    *  Are we currently dragging?
    */
   isDragging: function() {
-    return !!Session.get('dragOriginX');
+    return !!Session.get('__dragOriginX');
   },
 
+  /** 
+   * Is the given item currently being dragged?
+   */
   isDraggingItem: function(idOrItem) {
     var id = idOrItem._id || idOrItem;
-    return id == Session.get('dragKey');
+    return id == Session.get('__dragId');
   },
 
+  // Returns the id (if any) of the rectangle that the mouse cursor
+  // is currently positioned on top of.
   _getHoveringOnTopOfId: function() {
     if (!this.isDragging()) return null;
-    var id = this._idAt(Session.get('mouseX'), Session.get('mouseY'));
-    if (id == Session.get('dragKey')) return null;
+    var id = this._idAt(Session.get('__mouseX'), Session.get('__mouseY'));
+    if (id == Session.get('__dragId')) return null;
     return id;
   },
 
+  // Returns the id (if any) of the rectangle that the dragged rectangle 
+  // is currently positioned below. 
   _getHoveringBelowId: function(spacing) {
     var dragRect = this._getDragRectangle();
     if(!dragRect) return;
 
-    var mx = Session.get('mouseX'), 
-        my = Session.get('mouseY');
+    var mx = Session.get('__mouseX'), 
+        my = Session.get('__mouseY');
 
     for (var id in this._hitAreas) {
       var ha = this._hitAreas[id];
       // Is the drag rectangle below this hit area?
-      if ( Session.get('dragKey') != id && // cannot hover self
+      if ( Session.get('__dragId') != id && // cannot hover self
           dragRect.y2 > ha.y2 &&
           dragRect.y1 < ha.y2 + this._spacing &&
-          id != this._getClosestAboveId(Session.get('dragKey'))) return id;
+          id != this._getClosestAboveId(Session.get('__dragId'))) return id;
     }
     return null;
   },
 
+  // Returns the id of the rectangle immideately above 
+  // the rectangle with the given id.
   _getClosestAboveId: function(belowId) {
     var rectBelow = this._hitAreas[belowId],
         closestAboveRect = null,
@@ -158,9 +172,11 @@ DragMixin = {
     return closestAboveId;
   },
 
+  // Returns the rectangle that is currently 
+  // being dragged, if any.
   _getDragRectangle: function() {
     if (!this.isDragging()) return null;
-    var id = Session.get('dragKey'),
+    var id = Session.get('__dragId'),
         rect = this._hitAreas[id],
         deltaX = this.dragDeltaX(id),
         deltaY = this.dragDeltaY(id)
@@ -171,8 +187,7 @@ DragMixin = {
     }
   },
 
-  
-
+  // Returns the hitarea at given coordinates.
   _idAt: function(x, y) {
     for (var id in this._hitAreas) {
       var r = this._hitAreas[id];
