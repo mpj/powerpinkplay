@@ -70,14 +70,18 @@
     return Math.floor(scrubberWidth * progress);
   }
 
-  Template.playlistItem.isPlaceholderVisible = 
-    function() { return presenter.isHovering(this) }
+  Template.playlistItem.isPlaceholderVisible = function() { 
+    return presenter.isHoveringBelow(this) 
+  }
 
   Template.playlistItem.offsetX = 
     function() { return presenter.dragDeltaX(this) }
 
   Template.playlistItem.offsetY = 
     function() { return presenter.dragDeltaY(this) }
+
+  Template.playlistItem.isDragged = 
+    function() { return presenter.isDraggingItem(this) }
 
   Template.playlistItem.events = {
     
@@ -121,7 +125,8 @@
       });
       hitAreas['trash'] = getRectangle($('#trash'));
 
-      presenter.dragStarted(e.pageX, e.pageY, hitAreas);
+      var spacing = $("#playlist .placeholder").outerHeight(true);
+      presenter.dragStarted(e.pageX, e.pageY, hitAreas, spacing);
     }
 
   }

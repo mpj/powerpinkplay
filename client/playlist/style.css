@@ -39,7 +39,11 @@
 	font-size: 18px;
 	text-align: left;
 	cursor: default;
+}
+
+#playlist .playlistItem.dragged {
 	z-index: 99999;
+	width: 1000px;
 }
 
 #playlist .playlistItem .playPauseIcon {

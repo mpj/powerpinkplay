@@ -10,6 +10,7 @@
  * instead of piggybacking on Session.
  *
  */
+
 DragMixin = {
 
   /**
@@ -32,9 +33,11 @@ DragMixin = {
       }
    *
    */
-  dragStarted: function(x, y, hitAreas) {
+  dragStarted: function(x, y, hitAreas, spacing) {
     this._hitAreas = hitAreas;
-    this._draggedId = this._idAt(x, y);
+    var id = this._idAt(x, y);
+    this._spacing = spacing || 0;
+    Session.set('dragKey', id);
     Session.set('dragOriginX', x);
     Session.set('dragOriginY', y);
   },
@@ -54,12 +57,21 @@ DragMixin = {
    * the mixin is not aware of the DOM.
    */
   mouseup: function() {
-    var dropId = this._getHoveredId();
-    if (dropId && this._drop)
-      this._drop(this._draggedId, dropId);
+    if (this._drop) {
+      var dropBelowId = this._getHoveringBelowId();
+      if (dropBelowId) {
+        this._drop(Session.get('dragKey'), dropBelowId);
+      } else {
+        var dropOnTopOfId = this._getHoveringOnTopOfId();
+        if (dropOnTopOfId) 
+          this._drop(Session.get('dragKey'), dropOnTopOfId);
+      }
+
+    }
+    
     Session.set('dragOriginX', null);
     Session.set('dragOriginY', null);
-    this._draggedId = null;
+    Session.set('dragKey', null)
   },
 
   /**
@@ -67,7 +79,7 @@ DragMixin = {
    */
   dragDeltaY: function(idOrItem) {
     var id = idOrItem._id || idOrItem;
-    if (this._draggedId != id) return 0;
+    if (Session.get('dragKey') != id) return 0;
     return Session.get('mouseY') - Session.get('dragOriginY');
   },
 
@@ -76,7 +88,7 @@ DragMixin = {
    */
   dragDeltaX: function(idOrItem) { 
     var id = idOrItem._id || idOrItem;
-    if (this._draggedId != id) return 0;
+    if (Session.get('dragKey') != id) return 0;
     return Session.get('mouseX') - Session.get('dragOriginX');
   },
 
@@ -84,9 +96,11 @@ DragMixin = {
    *  Is a given id (or mongo document) 
    *  current being hovered?
    */
-  isHovering: function(idOrItem) {
+  isHoveringBelow: function(idOrItem) {
     var id = idOrItem._id || idOrItem;
-    return this._getHoveredId() == id;
+    if (!this.isDragging())     return false;
+    var hoveredId = this._getHoveringBelowId();
+    return hoveredId == id;
   },
   
   /**
@@ -96,12 +110,68 @@ DragMixin = {
     return !!Session.get('dragOriginX');
   },
 
-  _getHoveredId: function() {
-    if (!Session.get('dragOriginX')) return null;
+  isDraggingItem: function(idOrItem) {
+    var id = idOrItem._id || idOrItem;
+    return id == Session.get('dragKey');
+  },
+
+  _getHoveringOnTopOfId: function() {
+    if (!this.isDragging()) return null;
     var id = this._idAt(Session.get('mouseX'), Session.get('mouseY'));
-    if (id == this._draggedId) return null;
+    if (id == Session.get('dragKey')) return null;
     return id;
   },
+
+  _getHoveringBelowId: function(spacing) {
+    var dragRect = this._getDragRectangle();
+    if(!dragRect) return;
+
+    var mx = Session.get('mouseX'), 
+        my = Session.get('mouseY');
+
+    for (var id in this._hitAreas) {
+      var ha = this._hitAreas[id];
+      // Is the drag rectangle below this hit area?
+      if ( Session.get('dragKey') != id && // cannot hover self
+          dragRect.y2 > ha.y2 &&
+          dragRect.y1 < ha.y2 + this._spacing &&
+          id != this._getClosestAboveId(Session.get('dragKey'))) return id;
+    }
+    return null;
+  },
+
+  _getClosestAboveId: function(belowId) {
+    var rectBelow = this._hitAreas[belowId],
+        closestAboveRect = null,
+        closestAboveId = null;
+
+    for (var id in this._hitAreas) {
+      var rect = this._hitAreas[id];
+      if (rect.y2 < rectBelow.y1) {
+        if (!closestAboveRect || rect.y1 > closestAboveRect.y1) {
+          closestAboveRect = rect;
+          closestAboveId = id;
+        }
+      } 
+    }
+
+    return closestAboveId;
+  },
+
+  _getDragRectangle: function() {
+    if (!this.isDragging()) return null;
+    var id = Session.get('dragKey'),
+        rect = this._hitAreas[id],
+        deltaX = this.dragDeltaX(id),
+        deltaY = this.dragDeltaY(id)
+
+    return {
+        x1: rect.x1 + deltaX, x2: rect.x2 + deltaX,
+        y1: rect.y1 + deltaY, y2: rect.y2 + deltaY
+    }
+  },
+
+  
 
   _idAt: function(x, y) {
     for (var id in this._hitAreas) {
