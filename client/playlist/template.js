@@ -22,7 +22,7 @@
     function() { return presenter.playPauseIconClass(this) }
 
   Template.playlistItem.needlePosition = function() { 
-    var progress = presenter.needleProgress(this),
+    var progress = presenter.playProgress(this),
         scrubberWidth = $('.playlistItem .container').width();
     return Math.floor(scrubberWidth * progress);
   }
@@ -57,7 +57,7 @@
           offsetLeft = $container.offset().left,
           relativeX = e.clientX - offsetLeft,
           progress = relativeX / $container.width();
-      presenter.containerClicked(this, progress);
+      presenter.playlistItemClicked(this, progress);
     },
 
     'mousedown .moveIcon .clickArea': function(e) {
@@ -131,8 +131,6 @@
     
   }
 
-
-  
 
   $(document)
     .mouseup(function() { presenter.mouseup() })

@@ -12,8 +12,6 @@ _.extend(PlaylistPresenter.prototype, DragMixin);
 _.extend(PlaylistPresenter.prototype, TypeAheadMixin);
 _.extend(PlaylistPresenter.prototype, {
 
-  // Playlist itself ...
-
   isVisible: function() {
     // This view should only be visible if 
     // we have navigated to a playlist.
@@ -24,9 +22,6 @@ _.extend(PlaylistPresenter.prototype, {
     return !!this._getCurrentPlaylist() ? this._getCurrentPlaylist().name : '';
   },
 
-
-  // Items ... 
-
   items: function () {
     if (!this._getCurrentPlaylist()) return [];
     return player.items(this._getCurrentPlaylist());
@@ -34,6 +29,25 @@ _.extend(PlaylistPresenter.prototype, {
 
   isTrashVisible: function() {
     return this._dragHelper.getIsDragging();
+  },
+
+  playProgress: function(item) {
+
+    var progress = this._player.getProgress(item);
+    if (progress == 0) return 0;
+    
+    if (this._player.isPlaying(item)) { 
+      var ctx = Meteor.deps.Context.current;
+      Meteor.setTimeout(function() {
+        ctx.invalidate();
+      }, 250);
+    }
+
+    return progress;
+  },
+
+  playPauseIconClass: function(item) {
+    return this._player.isPlaying(item) ? 'icon-pause icon-white' : 'icon-play icon-white';
   },
 
 
@@ -58,10 +72,6 @@ _.extend(PlaylistPresenter.prototype, {
     this.clearTypeAhead();
   },
 
-  playPauseIconClass: function(item) {
-    return this._player.isPlaying(item) ? 'icon-pause icon-white' : 'icon-play icon-white';
-  },
-
   playPauseIconClicked: function(item) {
     if (player.isPlaying(item))
       player.pause(item);
@@ -69,25 +79,13 @@ _.extend(PlaylistPresenter.prototype, {
       player.play(item);
   },
 
-  needleProgress: function(item) {
-
-    var progress = this._player.getProgress(item);
-    if (progress == 0) return 0;
-    
-    if (this._player.isPlaying(item)) { 
-      var ctx = Meteor.deps.Context.current;
-      Meteor.setTimeout(function() {
-        ctx.invalidate();
-      }, 250);
-    }
-
-    return progress;
-  },
-
-  containerClicked: function(item, progress) {
+  playlistItemClicked: function(item, progress) {
     this._player.play(item, progress);
   },
+  
 
+  // This is an event handler, called by the DragMixin
+  // upon drop.
   _drop: function(dragToken, dropToken) {
     if (dropToken == "trash")
       player.remove(dragToken);

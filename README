@@ -32,3 +32,8 @@ Authentication in Meteor
 -----------------------
 Authentication is not yet implemented in Meteor, and I have not bothered to implement it myself either. Any further work would probably involve making some rudimentary authenticaton and doing some more selective publishing, instead of using the crazy default autopublish of Meteor.
 
+
+Dependencies in Meteor
+-----------------------
+Meteor lacks requires on the client, and falls back on simply loading scripts depth-first and then alphabetically, with the expection of the lib directory, which is loaded first. I've worked with this and simply gave files and directories underscore naming to give it the loading order I wanted, but I definitely feed the need to create something more elegant here.
+

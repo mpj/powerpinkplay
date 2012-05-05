@@ -27,8 +27,9 @@ _.extend(CreatePlaylistPresenter.prototype, {
   _createPlaylist: function() {
     var name = this._nameInputValue;
     if (name.length == 0) return;
-    var playlist = this._player.create(name);
-    Meteor.router.navigate("p/" + playlist.name_simple + "/", { trigger: true });
+    var playlist = this._player.create(name),
+        url = "p/" + playlist.name_simple;
+    Meteor.router.navigate(url, { trigger: true } );
   }
   
 })

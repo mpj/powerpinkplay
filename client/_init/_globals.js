@@ -1,3 +1,8 @@
+// Variables global in the client.
+// Normally, I don't like global variables. If I work more on this
+// I'd probably create a very simple IoC container to keep 
+// the global stuff in one place.
+
 serverTime = new ServerTime();
 player = new Player(serverTime);
 spotifyTrackSearch = new SpotifyTrackSearch;
