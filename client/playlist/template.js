@@ -1,6 +1,6 @@
 (function() {
   
-  var presenter = new PlaylistPresenter(player, spotifyTrackSearch);
+  var presenter = new PlaylistPresenter(player);
 
   _.extend(Template.playlist, {
     isVisible:  function() { return presenter.isVisible() },
@@ -106,7 +106,7 @@
           return presenter.selectPreviousTypeAhead();
 
         default:
-          return presenter.queryTypeAhead(e.target.value);
+          return presenter.queryTypeAhead(e.target.value, spotifyTrackSearch);
 
       }
         

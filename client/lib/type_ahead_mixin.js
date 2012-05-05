@@ -7,26 +7,21 @@ TypeAheadMixin = {
   
   /**
    * Executes the query. 
-   * Requires _searcher to be defined on the mixed-in class,
-   *  which is an object that defines search(query, callback).
-   *  
-   *  TODO: Make the _searcher some kind of interface, most likely
-   *  a base class that SpotifyTrackSearch and RdioSearch etc. inherits from.
-   *  Alternatively, make it more simple and just an argument to the function.
-  */ 
-  queryTypeAhead: function(query) {
-
-    if (!this._searcher || !this._searcher.search)
-      throw new Error("TypeAheadMixin requires _searcher to be defined.")
+   * 
+   *  searchFunction is a function that accepts a query and a callback.
+   *  The first argument to the callback will be any error that occured, 
+   *  and the second argument an array of results. 
+   */ 
+  queryTypeAhead: function(query, searchFunction) {
     
     Session.set('typeAheadIsLoading', true);
 
     // Wrap within a clearing timeout
     // to prevent API spamming
     if (this._timeoutHandle) clearTimeout(this._timeoutHandle);
-    var that = this, sess = Session;
+    var sess = Session;
     this._timeoutHandle = Meteor.setTimeout(function() {
-      that._searcher.search(query, function(error, results) {
+      searchFunction(query, function(error, results) {
         sess.set('typeAheadIsLoading', false);
         if(error)
           return; // Do nothing, yet.
