@@ -2,43 +2,37 @@
   
   var presenter = new PlaylistPresenter(player, spotifyTrackSearch);
 
-  Template.playlist.isVisible = 
-    function() { return presenter.isVisible() }
-  
-  Template.playlist.headerText = 
-    function() { return presenter.headerText() }
+  _.extend(Template.playlist, {
+    isVisible:  function() { return presenter.isVisible() },
+    headerText: function() { return presenter.headerText() }
+  });
+    
+  _.extend(Template.playlistItems, {
+    items:          function() { return presenter.items() },
+    isTrashVisible: function() { return presenter.isDragging() }
+  });
 
+  _.extend(Template.playlistItem, {
+    playPauseIconClass: function() { return presenter.playPauseIconClass(this) },
+    needlePosition: function() { 
+      var progress = presenter.playProgress(this),
+          scrubberWidth = $('.playlistItem .container').width();
+      return Math.floor(scrubberWidth * progress);
+    },
+    isPlaceholderVisible: function() { 
+      return presenter.isHoveringBelow(this) 
+    },
+    offsetX: function() { return presenter.dragDeltaX(this) },
+    offsetY: function() { return presenter.dragDeltaY(this) },
+    isDragged: function() { return presenter.isDraggingItem(this) }
 
+  });
 
-  Template.playlistItems.items = 
-    function() { return presenter.items() }
-
-  Template.playlistItems.isTrashVisible = 
-    function() { return presenter.isDragging() }
-
-
-
-  Template.playlistItem.playPauseIconClass =
-    function() { return presenter.playPauseIconClass(this) }
-
-  Template.playlistItem.needlePosition = function() { 
-    var progress = presenter.playProgress(this),
-        scrubberWidth = $('.playlistItem .container').width();
-    return Math.floor(scrubberWidth * progress);
-  }
-
-  Template.playlistItem.isPlaceholderVisible = function() { 
-    return presenter.isHoveringBelow(this) 
-  }
-
-  Template.playlistItem.offsetX = 
-    function() { return presenter.dragDeltaX(this) }
-
-  Template.playlistItem.offsetY = 
-    function() { return presenter.dragDeltaY(this) }
-
-  Template.playlistItem.isDragged = 
-    function() { return presenter.isDraggingItem(this) }
+  _.extend(Template.addPlaylistItem, {
+    typeAheadResults: function() { return presenter.typeAheadResults() },
+    isSelected:       function() { return presenter.isTypeAheadSelected(this) },
+    isLoading:        function() { return presenter.isTypeAheadLoading(this) }
+  });
 
   Template.playlistItem.events = {
     
@@ -88,17 +82,6 @@
 
   }
 
-
-
-  Template.addPlaylistItem.typeAheadResults = 
-    function() { return presenter.typeAheadResults() };
-  
-  Template.addPlaylistItem.isSelected = 
-    function() { return presenter.isTypeAheadSelected(this) }
-  
-  Template.addPlaylistItem.isLoading = 
-    function() { return presenter.isTypeAheadLoading(this) }
-
   Template.addPlaylistItem.events = {
     
     'focusout input': 
@@ -133,7 +116,7 @@
 
 
   $(document)
-    .mouseup(function() { presenter.mouseup() })
-    .mousemove(function(e) { presenter.mousemove(e.pageX, e.pageY) });
+    .mouseup( function() { presenter.mouseup() } )
+    .mousemove( function(e) { presenter.mousemove( e.pageX, e.pageY ) } );
 
 })();

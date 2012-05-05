@@ -1,8 +1,9 @@
 (function() {
   var presenter = new CreatePlaylistPresenter(player);
 
-  Template.createPlaylist.isVisible = 
-    function() { return presenter.isVisible() }
+  _.extend(Template.createPlaylist, {
+    isVisible: function() { return presenter.isVisible() }
+  });
 
   Template.createPlaylist.events = {
     
@@ -11,7 +12,6 @@
     },
     
     'keyup .name': function(e) {
-      console.log(presenter)
       if (e.keyCode == KEY_CODE_ENTER) 
         presenter.nameInputEnterKeyPressed();
       else
