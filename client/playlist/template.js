@@ -18,49 +18,6 @@
 
 
 
-  Template.addPlaylistItem.typeAheadResults = 
-    function() { return presenter.typeAheadResults() };
-  
-  Template.addPlaylistItem.isSelected = 
-    function() { return presenter.isTypeAheadSelected(this) }
-  
-  Template.addPlaylistItem.isLoading = 
-    function() { return presenter.isTypeAheadLoading(this) }
-
-  Template.addPlaylistItem.events = {
-    
-    'focusout input': 
-      function(e) { presenter.addPlaylistItemTextInputBlur() },
-    
-    'focusin input': 
-      function(e) { presenter.addPlaylistItemTextInputFocus() },
-
-    'keyup input': function(e) {
-      
-      switch(e.keyCode) {
-        
-        case KEY_CODE_ENTER:
-          $(e.target).val('').focus(); // TODO: Make this reactive.
-          presenter.addPlaylistItemTextInputEnterPressed();
-          break;
-        
-        case KEY_CODE_ARROW_DOWN:
-          return presenter.selectNextTypeAhead();
-
-        case KEY_CODE_ARROW_UP:
-          return presenter.selectPreviousTypeAhead();
-
-        default:
-          return presenter.queryTypeAhead(e.target.value);
-
-      }
-        
-    }
-    
-  }
-
-
-
   Template.playlistItem.playPauseIconClass =
     function() { return presenter.playPauseIconClass(this) }
 
@@ -130,6 +87,52 @@
     }
 
   }
+
+
+
+  Template.addPlaylistItem.typeAheadResults = 
+    function() { return presenter.typeAheadResults() };
+  
+  Template.addPlaylistItem.isSelected = 
+    function() { return presenter.isTypeAheadSelected(this) }
+  
+  Template.addPlaylistItem.isLoading = 
+    function() { return presenter.isTypeAheadLoading(this) }
+
+  Template.addPlaylistItem.events = {
+    
+    'focusout input': 
+      function(e) { presenter.addPlaylistItemTextInputBlur() },
+    
+    'focusin input': 
+      function(e) { presenter.addPlaylistItemTextInputFocus() },
+
+    'keyup input': function(e) {
+      
+      switch(e.keyCode) {
+        
+        case KEY_CODE_ENTER:
+          $(e.target).val('').focus(); // TODO: Make this reactive.
+          presenter.addPlaylistItemTextInputEnterPressed();
+          break;
+        
+        case KEY_CODE_ARROW_DOWN:
+          return presenter.selectNextTypeAhead();
+
+        case KEY_CODE_ARROW_UP:
+          return presenter.selectPreviousTypeAhead();
+
+        default:
+          return presenter.queryTypeAhead(e.target.value);
+
+      }
+        
+    }
+    
+  }
+
+
+  
 
   $(document)
     .mouseup(function() { presenter.mouseup() })
