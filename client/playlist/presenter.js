@@ -1,46 +1,42 @@
 PlaylistPresenter.prototype = new BasePresenter();
 PlaylistPresenter.prototype.constructor = PlaylistPresenter;
 
-function PlaylistPresenter(player, searcher) {
-  
-  this._player = player;
-  this._searcher = searcher;
-  
-}
-
 _.extend(PlaylistPresenter.prototype, DragMixin);
 _.extend(PlaylistPresenter.prototype, TypeAheadMixin);
-_.extend(PlaylistPresenter.prototype, {
 
-  isVisible: function() {
+function PlaylistPresenter(player) {
+  
+  var self = this;
+
+  this.isVisible = function() {
     // This view should only be visible if 
     // we have navigated to a playlist.
-    return !!this._getCurrentPlaylist();
-  },
+    return !!self._getCurrentPlaylist();
+  }
 
-  headerText: function() {
-    return !!this._getCurrentPlaylist() ? this._getCurrentPlaylist().name : '';
-  },
+  this.headerText = function() {
+    return !!self._getCurrentPlaylist() ? self._getCurrentPlaylist().name : '';
+  }
 
-  items: function () {
-    if (!this._getCurrentPlaylist()) return [];
-    return player.items(this._getCurrentPlaylist());
-  },
+  this.items = function () {
+    if (!self._getCurrentPlaylist()) return [];
+    return player.items(self._getCurrentPlaylist());
+  }
 
-  isTrashVisible: function() {
-    return this.isDragging();
-  },
+  this.isTrashVisible = function() {
+    return self.isDragging();
+  }
 
-  isPlaceholderVisible: function(item) {  
-    return this.isHoveringBelow(item);
-  },
+  this.isPlaceholderVisible = function(item) {  
+    return self.isHoveringBelow(item);
+  }
 
-  playProgress: function(item) {
+  this.playProgress = function(item) {
 
-    var progress = this._player.getProgress(item);
+    var progress = player.getProgress(item);
     if (progress == 0) return 0;
     
-    if (this._player.isPlaying(item)) { 
+    if (player.isPlaying(item)) { 
       var ctx = Meteor.deps.Context.current;
       Meteor.setTimeout(function() {
         ctx.invalidate();
@@ -48,53 +44,52 @@ _.extend(PlaylistPresenter.prototype, {
     }
 
     return progress;
-  },
+  }
 
-  playPauseIconClass: function(item) {
-    return this._player.isPlaying(item) ? 'icon-pause icon-white' : 'icon-play icon-white';
-  },
+  this.playPauseIconClass = function(item) {
+    return player.isPlaying(item) ? 'icon-pause icon-white' : 'icon-play icon-white';
+  }
 
+  this.addPlaylistItemTextInputBlur = function() {
+    self.hideTypeAhead();
+  }
 
-  addPlaylistItemTextInputBlur: function() {
-    this.hideTypeAhead();
-  },
+  this.addPlaylistItemTextInputFocus = function() {
+    self.showTypeAhead();
+  }
 
-  addPlaylistItemTextInputFocus: function() {
-    this.showTypeAhead();
-  },
-
-  addPlaylistItemTextInputEnterPressed: function() {
-    var selected = this._getSelectedTypeAhead(),
-        playlistId = this._getCurrentPlaylist()._id;
+  this.addPlaylistItemTextInputEnterPressed = function() {
+    var selected = self._getSelectedTypeAhead(),
+        playlistId = self._getCurrentPlaylist()._id;
     if(!selected) return;
-    this._player.add(
+    player.add(
       selected.label, 
       selected.data.href, 
       selected.data.duration, 
       playlistId
     );
-    this.clearTypeAhead();
+    self.clearTypeAhead();
   },
 
-  playPauseIconClicked: function(item) {
+  this.playPauseIconClicked = function(item) {
     if (player.isPlaying(item))
       player.pause(item);
     else
       player.play(item);
   },
 
-  playlistItemClicked: function(item, progress) {
-    this._player.play(item, progress);
+  this.playlistItemClicked = function(item, progress) {
+    player.play(item, progress);
   },
   
-
   // This is an event handler, called by the DragMixin
-  // upon drop.
-  _drop: function(dragToken, dropToken) {
+  // upon drop. While this should not be accessed by the view,
+  // it still needs to be priviliged to access the private player.
+  this._drop = function(dragToken, dropToken) {
     if (dropToken == "trash")
       player.remove(dragToken);
     else
       player.move(dragToken, dropToken);
   }
   
-})
+}

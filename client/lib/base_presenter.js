@@ -28,6 +28,10 @@ BasePresenter = function() {
 
 BasePresenter.prototype = {
 
+  // I'm not sure how to do this one in the best manner, 
+  // in another programming language, I'd have made this one protected.
+  // Using underscore in name to indicate that it's only to be used inside
+  // the presenter.
   _getCurrentPlaylist: function() {
     var simpleName  = Session.get('currentPlayListSimpleName'),
       selector  = { name_simple: simpleName };
