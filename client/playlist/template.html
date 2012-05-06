@@ -27,13 +27,13 @@
 
 
 <template name="playlistItem">
-  <div  {{#if isDragged}}
+  <div  {{#if isDraggingItem}}
           class="playlistItem dragged"
         {{else}}
           class="playlistItem"
         {{/if}}
         id="{{ _id }}"
-        style="left:{{ offsetX }}px;top:{{ offsetY }}px">
+        style="left:{{ dragDeltaX }}px; top:{{ dragDeltaY }}px">
 
     <span class="playPauseIcon" id="playPauseIcon_{{ _id }}">
       <span class="clickArea" id="playPauseIcon_clickArea_{{ _id }}"></span>
@@ -65,7 +65,7 @@
 <template name="addPlaylistItem">
   <div id="addPlaylistItem">
     <span class="loadingImage" 
-          {{#unless isLoading }} 
+          {{#unless isTypeAheadLoading }} 
             style="visibility:hidden" 
           {{/unless}}>
       <div class="spinner" />
@@ -73,7 +73,7 @@
     <input id="playlistViewNew" />
     <div class="typeAheads">
       {{#each typeAheadResults }}
-        <div class="option {{#if isSelected}}selected{{/if}}">{{ label }}</div>
+        <div class="option {{#if isTypeAheadSelected}}selected{{/if}}">{{ label }}</div>
       {{/each}}
     </div>
   </div>

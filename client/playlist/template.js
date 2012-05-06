@@ -2,36 +2,21 @@
   
   var presenter = new PlaylistPresenter(player);
 
-  _.extend(Template.playlist, {
-    isVisible:  function() { return presenter.isVisible() },
-    headerText: function() { return presenter.headerText() }
-  });
-    
-  _.extend(Template.playlistItems, {
-    items:          function() { return presenter.items() },
-    isTrashVisible: function() { return presenter.isDragging() }
-  });
+  presenter.glue(Template.playlist);
+  presenter.glue(Template.playlistItems);
+  presenter.glue(Template.playlistItem);
+  presenter.glue(Template.addPlaylistItem);
+
+  $(document)
+    .mouseup( function() { presenter.mouseup() } )
+    .mousemove( function(e) { presenter.mousemove( e.pageX, e.pageY ) } );
 
   _.extend(Template.playlistItem, {
-    playPauseIconClass: function() { return presenter.playPauseIconClass(this) },
     needlePosition: function() { 
       var progress = presenter.playProgress(this),
           scrubberWidth = $('.playlistItem .container').width();
       return Math.floor(scrubberWidth * progress);
     },
-    isPlaceholderVisible: function() { 
-      return presenter.isHoveringBelow(this) 
-    },
-    offsetX: function() { return presenter.dragDeltaX(this) },
-    offsetY: function() { return presenter.dragDeltaY(this) },
-    isDragged: function() { return presenter.isDraggingItem(this) }
-
-  });
-
-  _.extend(Template.addPlaylistItem, {
-    typeAheadResults: function() { return presenter.typeAheadResults() },
-    isSelected:       function() { return presenter.isTypeAheadSelected(this) },
-    isLoading:        function() { return presenter.isTypeAheadLoading(this) }
   });
 
   Template.playlistItem.events = {
@@ -114,9 +99,5 @@
     
   }
 
-
-  $(document)
-    .mouseup( function() { presenter.mouseup() } )
-    .mousemove( function(e) { presenter.mousemove( e.pageX, e.pageY ) } );
 
 })();

@@ -1,9 +1,7 @@
 (function() {
   var presenter = new CreatePlaylistPresenter(player);
 
-  _.extend(Template.createPlaylist, {
-    isVisible: function() { return presenter.isVisible() }
-  });
+  presenter.glue(Template.createPlaylist);
 
   Template.createPlaylist.events = {
     

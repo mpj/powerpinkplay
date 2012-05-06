@@ -28,7 +28,11 @@ _.extend(PlaylistPresenter.prototype, {
   },
 
   isTrashVisible: function() {
-    return this._dragHelper.getIsDragging();
+    return this.isDragging();
+  },
+
+  isPlaceholderVisible: function(item) {  
+    return this.isHoveringBelow(item);
   },
 
   playProgress: function(item) {
