@@ -2,34 +2,36 @@ CreatePlaylistPresenter.prototype = new BasePresenter();
 CreatePlaylistPresenter.prototype.constructor = CreatePlaylistPresenter;
 
 function CreatePlaylistPresenter(player) {
-  this._nameInputValue = null;
-  this._player = player;
-}
-
-_.extend(CreatePlaylistPresenter.prototype, {
-
-  isVisible: function() {
-    return !this._getCurrentPlaylist();
-  },
   
-  nameInputValueChanged: function(newValue) {
-    this._nameInputValue = newValue.trim();
-  },
+  // Priviliged:
+  this.isVisible = function() {
+    return !self._getCurrentPlaylist();
+  }
+  
+  this.nameInputValueChanged = function(newValue) {
+    nameInputValue = newValue.trim();
+  }
 
-  nameInputEnterKeyPressed: function() {
-    this._createPlaylist();
-  },
+  this.nameInputEnterKeyPressed = function() {
+    createPlaylist();
+    nameInputValue = '';  
+  }
 
-  buttonClicked: function() {
-    this._createPlaylist();
-  },
+  this.buttonClicked = function() {
+    createPlaylist();
+  }
+  
+  // Private:
 
-  _createPlaylist: function() {
-    var name = this._nameInputValue;
-    if (name.length == 0) return;
-    var playlist = this._player.create(name),
+  var self = this,
+      nameInputValue = '';
+      
+  var createPlaylist = function() {
+    if (nameInputValue.length == 0) return;
+    var playlist = player.create(nameInputValue),
         url = "p/" + playlist.name_simple;
     Meteor.router.navigate(url, { trigger: true } );
   }
   
-})
+}
+
